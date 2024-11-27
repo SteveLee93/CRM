@@ -1,0 +1,260 @@
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-header text-center mb-4">
+    <div class="d-flex justify-content-center">
+      <h4 class="text-white fw-bold mb-0">
+        <i class="fas fa-hotel me-2"></i>
+        호텔 관리
+      </h4>
+    </div>
+  </div>
+
+  <!-- 메뉴 아이템들을 감싸는 div -->
+  <div class="d-flex flex-column h-100">
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link" href="/dashboard" id="nav-dashboard">
+          <i class="fas fa-home"></i>
+          <span>객실 예약</span>
+        </a>
+      </li>
+      <li class="nav-item admin-only" style="display: none;">
+        <a class="nav-link" href="/room-management" id="nav-room">
+          <i class="fas fa-bed"></i>
+          <span>객실 관리</span>
+        </a>
+      </li>
+      <li class="nav-item admin-only" style="display: none;">
+        <a class="nav-link" href="/customer-management" id="nav-customer">
+          <i class="fas fa-users"></i>
+          <span>고객 관리</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#" id="nav-logout">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>로그아웃</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<button class="btn text-white" id="sidebarToggle">
+  <i class="fas fa-angles-left"></i>
+</button>
+
+<style>
+  .sidebar {
+    width: 250px;
+    height: 100vh;
+    background: linear-gradient(180deg, #1e3c72 0%, #2a5298 100%);
+    color: white;
+    position: fixed;
+    left: 0;
+    top: 0;
+    padding-top: 0;
+    z-index: 1000;
+    box-shadow: 4px 0 15px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+  }
+
+  .sidebar-header {
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 1.5rem;
+  }
+
+  .sidebar-header h4 {
+    margin: 0;
+    font-size: 1.4rem;
+    letter-spacing: 0.5px;
+    padding-left: 15px;
+  }
+
+  #sidebarToggle {
+    position: fixed;
+    left: 10px;
+    top: 10px;
+    z-index: 1001;
+    background: linear-gradient(45deg, #1e3c72, #2a5298);
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  #sidebarToggle i {
+    transition: transform 0.3s ease;
+  }
+
+  .sidebar.collapsed~#sidebarToggle i {
+    transform: rotate(180deg);
+  }
+
+  @media (max-width: 991.98px) {
+    #sidebarToggle {
+      left: 10px;
+    }
+
+    .sidebar.show~#sidebarToggle i {
+      transform: rotate(180deg);
+    }
+  }
+
+  .nav-link {
+    text-decoration: none !important;
+    color: rgba(255, 255, 255, 0.8) !important;
+    padding: 0.8rem 1.5rem;
+    border-radius: 0;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+  }
+
+  .nav-link:hover {
+    color: white !important;
+    background: rgba(255, 255, 255, 0.1);
+    padding-left: 2rem;
+  }
+
+  .nav-link.active {
+    color: white !important;
+    background: rgba(255, 255, 255, 0.15);
+    border-left: 4px solid white;
+    padding-left: calc(1.5rem - 4px);
+  }
+
+  .nav-link i {
+    width: 20px;
+    margin-right: 10px;
+    font-size: 1.1rem;
+  }
+
+  .nav-link span {
+    font-size: 0.95rem;
+    font-weight: 500;
+  }
+
+  .sidebar.collapsed {
+    transform: translateX(-250px);
+  }
+
+  .main-content {
+    margin-left: 250px;
+    transition: margin-left 0.3s ease;
+    padding: 20px;
+  }
+
+  .main-content.expanded {
+    margin-left: 0;
+  }
+
+  @media (max-width: 991.98px) {
+    .sidebar {
+      transform: translateX(-250px);
+    }
+
+    .sidebar.show {
+      transform: translateX(0);
+    }
+
+    .main-content {
+      margin-left: 0;
+    }
+  }
+</style>
+
+<script id="sidebarScript">
+  function initializeSidebar() {
+    const toggleButton = document.getElementById('sidebarToggle');
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.querySelector('.main-content');
+
+    if (toggleButton && sidebar && mainContent) {
+      document.body.appendChild(toggleButton);
+
+      // 초기 아이콘 상태 설정
+      const updateIcon = () => {
+        const icon = toggleButton.querySelector('i');
+        if (window.innerWidth <= 991.98) {
+          icon.className = sidebar.classList.contains('show') ?
+            'fas fa-angles-left' : 'fas fa-angles-right';
+        } else {
+          icon.className = sidebar.classList.contains('collapsed') ?
+            'fas fa-angles-right' : 'fas fa-angles-left';
+        }
+      };
+
+      // 기존 이벤트 리스너에 아이콘 업데이트 추가
+      toggleButton.addEventListener('click', function (e) {
+        e.preventDefault();
+        sidebar.classList.toggle('collapsed');
+        mainContent.classList.toggle('expanded');
+        updateIcon();
+      });
+
+      // 초기 상태 및 리사이즈 시 아이콘 업데이트
+      updateIcon();
+      window.addEventListener('resize', updateIcon);
+    }
+
+    // admin-only 요소들 체크 및 표시
+    const adminElements = document.querySelectorAll('.admin-only');
+    console.log('Found admin elements:', adminElements.length);
+
+    fetch('/api/check-admin')
+      .then(response => response.json())
+      .then(data => {
+        console.log('Admin check response:', data);
+        if (data.isAdmin) {
+          console.log('User is admin, showing admin elements');
+          adminElements.forEach(el => {
+            el.style.display = 'block';
+            console.log('Showing element:', el);
+          });
+        } else {
+          console.log('User is not admin');
+        }
+      })
+      .catch(error => {
+        console.error('Error checking admin status:', error);
+        alert('관리자 권한 확인 중 오류가 발생했습니다: ' + error.message);
+      });
+
+    // 로그아웃 기능 추가
+    const logoutLink = document.getElementById('nav-logout');
+    if (logoutLink) {
+      logoutLink.addEventListener('click', function (e) {
+        e.preventDefault();
+        if (confirm('로그아웃 하시겠습니까?')) {
+          fetch('/api/logout', {
+            method: 'POST',
+            credentials: 'same-origin'
+          })
+            .then(response => {
+              if (response.ok) {
+                window.location.href = '/';
+              }
+            })
+            .catch(error => {
+              console.error('Logout error:', error);
+              alert('로그아웃 중 오류가 발생했습니다.');
+            });
+        }
+      });
+    }
+  }
+
+  // 페이지 로드 시 초기화
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeSidebar);
+  } else {
+    initializeSidebar();
+  }
+</script>

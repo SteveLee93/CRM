@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>객실 관리</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    body {
+      overflow-x: hidden;
+      background-color: #f8f9fa;
+    }
+
+    .page-wrapper {
+      min-height: 100vh;
+      padding: 20px 40px;
+      background-color: #f8f9fa;
+    }
+
+    .main-content {
+      margin-left: 250px;
+      padding-top: 40px;
+      transition: margin-left 0.3s ease;
+    }
+
+    .room-table th,
+    .room-table td {
+      vertical-align: middle;
+    }
+
+    /* 컨테이너 내부 여백 */
+    .container-fluid {
+      max-width: 1800px;
+      margin: 0 auto;
+    }
+
+    /* 모바일 대응 */
+    @media (max-width: 991.98px) {
+      .page-wrapper {
+        padding: 15px 20px;
+      }
+
+      .main-content {
+        margin-left: 0;
+        padding-top: 40px;
+      }
+    }
+
+    .card {
+      box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+      border: none;
+      margin-bottom: 1rem;
+    }
+
+    .card-body {
+      padding: 1.25rem;
+    }
+
+    .card-title {
+      margin-bottom: 0.75rem;
+      font-size: 1rem;
+      font-weight: 500;
+    }
+
+    .card-text {
+      margin-bottom: 0;
+      font-weight: 700;
+    }
+
+    canvas {
+      max-height: 300px;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- 사이드바가 로드될 컨테이너 -->
+  <div id="sidebarContainer"></div>
+
+  <!-- 전체 컨텐츠를 감싸는 wrapper -->
+  <div class="page-wrapper">
+    <!-- 메인 컨텐츠 -->
+    <div class="main-content">
+      <div class="container-fluid">
+        <!-- 대시보드 섹션 추가 -->
+        <div class="row mb-4">
+          <!-- 전체 현황 카드 -->
+          <div class="col-md-3">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">전체 객실</h5>
+                <h2 class="card-text" id="totalRooms">0</h2>
+              </div>
+            </div>
+          </div>
+          <!-- 이용 가능 객실 -->
+          <div class="col-md-3">
+            <div class="card bg-success text-white">
+              <div class="card-body">
+                <h5 class="card-title">이용 가능</h5>
+                <h2 class="card-text" id="availableRooms">0</h2>
+              </div>
+            </div>
+          </div>
+          <!-- 사용 중인 객실 -->
+          <div class="col-md-3">
+            <div class="card bg-danger text-white">
+              <div class="card-body">
+                <h5 class="card-title">사용 중</h5>
+                <h2 class="card-text" id="occupiedRooms">0</h2>
+              </div>
+            </div>
+          </div>
+          <!-- 점검 중인 객실 -->
+          <div class="col-md-3">
+            <div class="card bg-warning">
+              <div class="card-body">
+                <h5 class="card-title">점검 중</h5>
+                <h2 class="card-text" id="maintenanceRooms">0</h2>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 차트 섹션 -->
+        <div class="row mb-4">
+          <!-- 객실 상태 파이 차트 -->
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">객실 상태 현황</h5>
+                <canvas id="statusChart"></canvas>
+              </div>
+            </div>
+          </div>
+          <!-- 객실 타입별 현황 차트 -->
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">객실 타입별 현황</h5>
+                <canvas id="typeChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h2 class="mb-4">객실 관리
+          <button class="btn btn-primary float-end" onclick="showAddModal()">
+            <i class="fas fa-plus"></i> 객실 추가
+          </button>
+        </h2>
+
+        <div class="table-responsive">
+          <table class="table table-hover room-table">
+            <thead class="table-dark">
+              <tr>
+                <th>객실 번호</th>
+                <th>객실 타입</th>
+                <th>상태</th>
+                <th>관리</th>
+              </tr>
+            </thead>
+            <tbody id="roomTableBody">
+              <!-- JavaScript로 동적 생성 -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 객실 추가/수정 모달 -->
+  <div class="modal fade" id="roomModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalTitle">객실 추가</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="roomForm">
+            <div class="mb-3">
+              <label class="form-label">객실 번호</label>
+              <input type="text" class="form-control" id="roomNumber" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">객실 타입</label>
+              <select class="form-select" id="roomType" required>
+                <option value="VIP">VIP</option>
+                <option value="SUITE">SUITE</option>
+                <option value="BUSINESS">BUSINESS</option>
+                <option value="NORMAL">NORMAL</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">객실 상태</label>
+              <select class="form-select" id="roomStatus" required>
+                <option value="available">이용 가능</option>
+                <option value="occupied">사용 중</option>
+                <option value="maintenance">점검 중</option>
+              </select>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+          <button type="button" class="btn btn-primary" id="saveButton">저장</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    let modal;
+    let currentMode = 'add';
+
+    function loadSidebar() {
+      fetch('/html/components/sidebar.html')
+        .then(response => response.text())
+        .then(html => {
+          document.getElementById('sidebarContainer').innerHTML = html;
+
+          // 스크립트 실행
+          const scriptContent = html.match(/<script id="sidebarScript">([\s\S]*?)<\/script>/);
+          if (scriptContent && scriptContent[1]) {
+            eval(scriptContent[1]);  // 스크립트 직접 실행
+
+            // 현재 페이지 메뉴 활성화
+            const roomLink = document.getElementById('nav-room');
+            if (roomLink) {
+              roomLink.classList.add('active');
+            }
+          }
+        })
+        .catch(error => console.error('Error loading sidebar:', error));
+    }
+
+    // 페이지 초기화
+    document.addEventListener('DOMContentLoaded', function () {
+      loadSidebar();
+      modal = new bootstrap.Modal(document.getElementById('roomModal'));
+      loadRooms();
+
+      // 저장 버튼 이벤트 리스너
+      document.getElementById('saveButton').addEventListener('click', handleSave);
+    });
+
+    // 저장 로직을 별도 함수로 분리
+    function handleSave() {
+      const roomNumber = document.getElementById('roomNumber').value;
+      const roomType = document.getElementById('roomType').value;
+      const status = document.getElementById('roomStatus').value;
+
+      if (!roomNumber || !roomType || !status) {
+        alert('모든 필드를 입력해주세요.');
+        return;
+      }
+
+      const data = { roomNumber, roomType, status };
+      const method = currentMode === 'add' ? 'POST' : 'PUT';
+      const url = currentMode === 'add' ? '/api/room' : `/api/room/${roomNumber}`;
+
+      fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      })
+        .then(response => response.json())
+        .then(result => {
+          if (result.success) {
+            alert(result.message);
+            modal.hide();
+            loadRooms();
+          } else {
+            alert(result.message || '작업에 실패했습니다.');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('오류가 발생했습니다.');
+        });
+    }
+
+    function showAddModal() {
+      currentMode = 'add';
+      document.getElementById('modalTitle').textContent = '객실 추가';
+      document.getElementById('roomForm').reset();
+      document.getElementById('roomNumber').readOnly = false;
+      modal.show();
+    }
+
+    // 대시보드 데이터 업데이트 함수
+    // rooms 배열을 받아서 대시보드의 통계와 차트를 업데이트합니다
+    function updateDashboard(rooms) {
+      // 객실 상태별 통계를 계산합니다
+      // total: 전체 객실 수
+      // available: 이용 가능한 객실 수 
+      // occupied: 사용 중인 객실 수
+      // maintenance: 점검 중인 객실 수
+      const stats = {
+        total: rooms.length,
+        available: rooms.filter(r => r.status === 'available').length,
+        occupied: rooms.filter(r => r.status === 'occupied').length,
+        maintenance: rooms.filter(r => r.status === 'maintenance').length
+      };
+
+      // 계산된 통계를 화면의 카운터에 표시합니다
+      document.getElementById('totalRooms').textContent = stats.total;
+      document.getElementById('availableRooms').textContent = stats.available;
+      document.getElementById('occupiedRooms').textContent = stats.occupied;
+      document.getElementById('maintenanceRooms').textContent = stats.maintenance;
+
+      // 객실 상태 원형 차트를 업데이트합니다
+      updateStatusChart(stats);
+      
+      // 객실 타입별 통계를 계산합니다
+      // VIP, SUITE, BUSINESS, NORMAL 각각의 객실 수를 집계합니다
+      const typeStats = {
+        VIP: rooms.filter(r => r.roomType === 'VIP').length,
+        SUITE: rooms.filter(r => r.roomType === 'SUITE').length,
+        BUSINESS: rooms.filter(r => r.roomType === 'BUSINESS').length,
+        NORMAL: rooms.filter(r => r.roomType === 'NORMAL').length
+      };
+      
+      // 객실 타입별 막대 차트를 업데이트합니다
+      updateTypeChart(typeStats);
+    }
+
+    // 객실 상태 원형 차트 생성/업데이트 함수
+    let statusChart; // 차트 인스턴스를 전역 변수로 저장
+    function updateStatusChart(stats) {
+      const ctx = document.getElementById('statusChart').getContext('2d');
+      
+      // 차트에 표시할 데이터 설정
+      const data = {
+        labels: ['이용 가능', '사용 중', '점검 중'],
+        datasets: [{
+          data: [stats.available, stats.occupied, stats.maintenance],
+          backgroundColor: ['#198754', '#dc3545', '#ffc107'] // 각 상태별 색상
+        }]
+      };
+
+      // 이전 차트가 있다면 제거
+      if (statusChart) {
+        statusChart.destroy();
+      }
+
+      // 새로운 원형 차트 생성
+      statusChart = new Chart(ctx, {
+        type: 'pie',
+        data: data,
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'bottom' // 범례를 하단에 표시
+            }
+          }
+        }
+      });
+    }
+
+    // 객실 타입별 막대 차트 생성/업데이트 함수
+    let typeChart; // 차트 인스턴스를 전역 변수로 저장
+    function updateTypeChart(stats) {
+      const ctx = document.getElementById('typeChart').getContext('2d');
+      
+      // 차트에 표시할 데이터 설정
+      const data = {
+        labels: ['VIP', 'SUITE', 'BUSINESS', 'NORMAL'],
+        datasets: [{
+          label: '객실 수',
+          data: [stats.VIP, stats.SUITE, stats.BUSINESS, stats.NORMAL],
+          backgroundColor: ['#4b0082', '#800080', '#4169e1', '#20b2aa'] // 각 타입별 색상
+        }]
+      };
+
+      // 이전 차트가 있다면 제거
+      if (typeChart) {
+        typeChart.destroy();
+      }
+
+      // 새로운 막대 차트 생성
+      typeChart = new Chart(ctx, {
+        type: 'bar',
+        data: data,
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              display: false // 범례 숨김
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                stepSize: 1 // y축 눈금을 1단위로 표시
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // 객실 목록을 서버에서 가져와서 화면에 표시하는 함수
+    function loadRooms() {
+      // API 엔드포인트로 GET 요청
+      fetch('/api/room')
+        .then(response => response.json())
+        .then(rooms => {
+          // 객실 목록 테이블 업데이트
+          const tbody = document.getElementById('roomTableBody');
+          tbody.innerHTML = rooms.map(room => `
+                    <tr>
+                        <td>${room.roomNumber}</td>
+                        <td>${room.roomType}</td>
+                        <td><span class="badge ${getStatusBadgeClass(room.status)}">${getStatusText(room.status)}</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-primary" onclick="editRoom('${room.roomNumber}')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteRoom('${room.roomNumber}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+
+          // 대시보드의 통계와 차트 업데이트
+          updateDashboard(rooms);
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('객실 목록을 불러오는데 실패했습니다.');
+        });
+    }
+
+    function editRoom(roomNumber) {
+      currentMode = 'edit';
+      document.getElementById('modalTitle').textContent = '객실 수정';
+      document.getElementById('roomNumber').value = roomNumber;
+      document.getElementById('roomNumber').readOnly = true;
+
+      // 현재 객실 정보 가져오기
+      fetch(`/api/room/${roomNumber}`)
+        .then(response => response.json())
+        .then(room => {
+          if (room) {
+            document.getElementById('roomType').value = room.roomType;
+            document.getElementById('roomStatus').value = room.status;
+            modal.show();
+          } else {
+            alert('객실 정보를 찾을 수 없습니다.');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('객실 정보를 불러오는데 실패했습니다.');
+        });
+    }
+
+    function deleteRoom(roomNumber) {
+      if (confirm('정말로 이 객실을 삭제하시겠습니까?')) {
+        fetch(`/api/room/${roomNumber}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+          .then(response => response.json())
+          .then(result => {
+            console.log('Delete result:', result); // 디버깅용
+            if (result.success) {
+              alert(result.message);
+              loadRooms(); // 목록 새로고침
+            } else {
+              alert(result.message || '삭제에 실패했습니다.');
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            alert('객실 삭제 중 오류가 발생했습니다.');
+          });
+      }
+    }
+
+    function getStatusBadgeClass(status) {
+      switch (status.toLowerCase()) {
+        case 'available': return 'bg-success';
+        case 'occupied': return 'bg-danger';
+        case 'maintenance': return 'bg-warning';
+        default: return 'bg-secondary';
+      }
+    }
+
+    function getStatusText(status) {
+      switch (status.toLowerCase()) {
+        case 'available': return '이용 가능';
+        case 'occupied': return '사용 중';
+        case 'maintenance': return '점검 중';
+        default: return '상태 미정';
+      }
+    }
+  </script>
+</body>
+
+</html>

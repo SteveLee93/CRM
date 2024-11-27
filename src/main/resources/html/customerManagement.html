@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>고객 관리</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    body {
+      overflow-x: hidden;
+      background-color: #f8f9fa;
+    }
+
+    .page-wrapper {
+      min-height: 100vh;
+      padding: 20px 40px;
+      background-color: #f8f9fa;
+    }
+
+    .main-content {
+      margin-left: 250px;
+      padding-top: 40px;
+      transition: margin-left 0.3s ease;
+    }
+
+    /* 카드 스타일 */
+    .card {
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+
+    .card-header {
+      background: linear-gradient(45deg, #1e3c72, #2a5298);
+      color: white;
+      border-radius: 15px 15px 0 0 !important;
+      padding: 1rem 1.5rem;
+    }
+
+    /* 검색 입력창 스타일 */
+    #searchInput {
+      min-width: 200px;
+    }
+
+    /* select 박스 스타일 */
+    #searchType {
+      min-width: 50px;
+      width: auto;
+    }
+
+    /* input-group 전체 너비 */
+    .input-group {
+      min-width: 300px;
+    }
+
+    /* 정렬 관련 스타일 */
+    .sortable {
+      cursor: pointer;
+      user-select: none;
+      position: relative;
+      padding-right: 25px !important;
+      text-align: center !important;
+    }
+
+    .sortable i,
+    .sortable::after {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .sortable i {
+      margin-left: 5px;
+      color: #ccc;
+      transition: all 0.2s ease;
+    }
+
+    /* 기본 정렬 아이콘 */
+    .sortable i.fa-sort {
+      opacity: 0.3;
+    }
+
+    /* 오름차순 정렬 시 */
+    .sortable.asc i.fa-sort {
+      display: none;
+    }
+
+    .sortable.asc::after {
+      content: '\f0d8';
+      font-family: 'Font Awesome 6 Free';
+      font-weight: 900;
+      margin-left: 5px;
+      color: #1e3c72;
+    }
+
+    /* 내림차순 정렬 시 */
+    .sortable.desc i.fa-sort {
+      display: none;
+    }
+
+    .sortable.desc::after {
+      content: '\f0d7';
+      font-family: 'Font Awesome 6 Free';
+      font-weight: 900;
+      margin-left: 5px;
+      color: #1e3c72;
+    }
+
+    /* 반응형 디자인 */
+    @media (max-width: 991.98px) {
+      .main-content {
+        margin-left: 0;
+      }
+
+      #sidebarContainer {
+        display: none;
+      }
+    }
+
+    /* 사이드바 관련 스타일 추가 */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: 250px;
+      background: linear-gradient(45deg, #1e3c72, #2a5298);
+      z-index: 1000;
+      transition: all 0.3s ease;
+    }
+
+    .sidebar.collapsed {
+      margin-left: -250px;
+    }
+
+    .main-content {
+      margin-left: 250px;
+      transition: margin-left 0.3s ease;
+    }
+
+    .main-content.expanded {
+      margin-left: 0;
+    }
+
+    @media (max-width: 991.98px) {
+      .main-content {
+        margin-left: 0;
+      }
+
+      .sidebar {
+        margin-left: -250px;
+      }
+
+      .sidebar.show {
+        margin-left: 0;
+      }
+    }
+
+    /* 사이드바 관련 스타일 수정 */
+    .toggle-sidebar {
+      display: none;
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 1001;
+    }
+
+    /* 모바일 대응 */
+    @media (max-width: 991.98px) {
+      .page-wrapper {
+        padding: 15px 20px;
+      }
+
+      .main-content {
+        margin-left: 0;
+        padding-top: 40px;
+      }
+
+      .toggle-sidebar {
+        display: block !important;
+      }
+    }
+
+    /* 페이지네이션 버튼 스타일 추가 */
+    .pagination .page-link {
+      min-width: 36px;
+      /* 두 자리 숫자를 기준으로 한 너비 */
+      text-align: center;
+      padding: 6px 6px;
+      /* 좌우 패딩 조정 */
+    }
+
+    /* 처음/마지막 버튼의 아이콘 정렬 */
+    .pagination .page-link i {
+      display: inline-block;
+      width: 14px;
+      /* 아이콘 너비 고정 */
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- 사이드바가 로드될 컨테이너 -->
+  <div id="sidebarContainer"></div>
+
+  <!-- 전체 컨텐츠를 감싸는 wrapper -->
+  <div class="page-wrapper">
+    <!-- 메인 컨텐츠 -->
+    <div class="main-content">
+      <div class="container-fluid">
+        <!-- 검색 및 필터링 -->
+        <div class="card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">고객 관리</h5>
+            <div class="d-flex gap-2">
+              <div class="input-group" style="width: auto;">
+                <select class="form-select" id="searchType">
+                  <option value="all">전체</option>
+                  <option value="username">아이디</option>
+                  <option value="name">이름</option>
+                  <option value="email">이메일</option>
+                </select>
+                <input type="text" class="form-control" id="searchInput" placeholder="검색어를 입력하세요">
+              </div>
+              <button class="btn btn-primary" id="addCustomerBtn">
+                <i class="fas fa-plus"></i> 고객 추가
+              </button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th class="sortable" data-sort="id">ID <i class="fas fa-sort"></i></th>
+                    <th class="sortable" data-sort="username">아이디 <i class="fas fa-sort"></i></th>
+                    <th class="sortable" data-sort="name">이름 <i class="fas fa-sort"></i></th>
+                    <th class="sortable" data-sort="email">이메일 <i class="fas fa-sort"></i></th>
+                    <th>관리</th>
+                  </tr>
+                </thead>
+                <tbody id="customerTableBody">
+                  <!-- 고객 데이터는 JavaScript로 동적 추가됨 -->
+                </tbody>
+              </table>
+            </div>
+            <!-- 페이지네이션 -->
+            <nav>
+              <ul class="pagination justify-content-center" id="pagination">
+                <!-- 페이지네이션은 JavaScript로 동적 추가됨 -->
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 고객 추가 모달 -->
+  <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addModalLabel">새 고객 추가</h5>
+          <button type="button" class="btn-close" onclick="cancelAdd()" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="addUsername" class="form-label">아이디 *</label>
+            <input type="text" class="form-control" id="addUsername" oninput="checkUsernameReal(this.value)">
+            <div id="usernameCheck" class="form-text"></div>
+          </div>
+          <div class="mb-3">
+            <label for="addPassword" class="form-label">비밀번호 *</label>
+            <input type="password" class="form-control" id="addPassword">
+          </div>
+          <div class="mb-3">
+            <label for="addName" class="form-label">이름 *</label>
+            <input type="text" class="form-control" id="addName">
+          </div>
+          <div class="mb-3">
+            <label for="addEmail" class="form-label">이메일 *</label>
+            <input type="email" class="form-control" id="addEmail" oninput="checkEmailReal(this.value)">
+            <div id="emailCheck" class="form-text"></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="cancelAdd()">취소</button>
+          <button type="button" class="btn btn-primary" onclick="addCustomer()">추가</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 고객 수정 모달 -->
+  <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editModalLabel">고객 정보 수정</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="editId">
+          <div class="mb-3">
+            <label for="editUsername" class="form-label">아이디</label>
+            <input type="text" class="form-control" id="editUsername" readonly>
+          </div>
+          <div class="mb-3">
+            <label for="editName" class="form-label">이름 *</label>
+            <input type="text" class="form-control" id="editName">
+          </div>
+          <div class="mb-3">
+            <label for="editEmail" class="form-label">이메일 *</label>
+            <input type="email" class="form-control" id="editEmail" oninput="checkEditEmailReal(this.value)">
+            <div id="editEmailCheck" class="form-text"></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+          <button type="button" class="btn btn-primary" onclick="updateCustomer()">수정</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    let totalCustomers = [];
+    let currentPage = 1;
+    const itemsPerPage = 10;
+    let isUsernameAvailable = false;
+    let isEmailAvailable = false;
+    let originalCustomerData = null;
+
+    // 사이드바 로드 함수 수정
+    function loadSidebar() {
+      fetch('/html/components/sidebar.html')
+        .then(response => response.text())
+        .then(html => {
+          document.getElementById('sidebarContainer').innerHTML = html;
+
+          // 스크립트 실행
+          const scriptContent = html.match(/<script id="sidebarScript">([\s\S]*?)<\/script>/);
+          if (scriptContent && scriptContent[1]) {
+            eval(scriptContent[1]);  // 스크립트 직접 실행
+
+            // 현재 페이지 메뉴 활성화
+            const customerLink = document.getElementById('nav-customer');
+            if (customerLink) {
+              customerLink.classList.add('active');
+            }
+          }
+        })
+        .catch(error => console.error('Error loading sidebar:', error));
+    }
+
+    // 페이지 초기화 부분 수정 (362-369번 라인)
+    document.addEventListener('DOMContentLoaded', function () {
+      console.log('Customer Management page loaded');
+      loadSidebar();
+      loadCustomers();
+      checkSession();
+
+      // 고객 추가 버튼 클릭 이벤트 리스너 추가
+      document.getElementById('addCustomerBtn').addEventListener('click', function () {
+        // 모달 초기화
+        document.getElementById('addUsername').value = '';
+        document.getElementById('addPassword').value = '';
+        document.getElementById('addName').value = '';
+        document.getElementById('addEmail').value = '';
+        document.getElementById('usernameCheck').innerHTML = '';
+        document.getElementById('emailCheck').innerHTML = '';
+        isUsernameAvailable = false;
+        isEmailAvailable = false;
+
+        // 모달 열기
+        const modal = new bootstrap.Modal(document.getElementById('addModal'));
+        modal.show();
+      });
+    });
+
+    // 검색 이벤트 리스너 설정
+    const searchInput = document.getElementById('searchInput');
+    const searchType = document.getElementById('searchType');
+
+    let debounceTimer;
+    searchInput.addEventListener('input', () => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        searchCustomers();
+      }, 300);
+    });
+
+    searchType.addEventListener('change', () => {
+      searchCustomers();
+    });
+
+    // 정렬 이벤트 리스너 설정
+    document.querySelectorAll('.sortable').forEach(header => {
+      header.addEventListener('click', () => {
+        sortCustomers(header.dataset.sort);
+      });
+    });
+
+    // 실시간 아이디 중복 확인
+    async function checkUsernameReal(username) {
+      const checkResult = document.getElementById('usernameCheck');
+
+      if (!username) {
+        checkResult.innerHTML = '아이디를 입력해주세요.';
+        checkResult.className = 'form-text text-danger';
+        isUsernameAvailable = false;
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/check-username?username=${encodeURIComponent(username)}`);
+        const data = await response.json();
+
+        if (data.available) {
+          checkResult.innerHTML = '사용 가능한 아이디입니다.';
+          checkResult.className = 'form-text text-success';
+          isUsernameAvailable = true;
+        } else {
+          checkResult.innerHTML = '이미 사용중인 아이디입니다.';
+          checkResult.className = 'form-text text-danger';
+          isUsernameAvailable = false;
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        checkResult.innerHTML = '중복 확인 중 오류가 발생했습니다.';
+        checkResult.className = 'form-text text-danger';
+        isUsernameAvailable = false;
+      }
+    }
+
+    // 실시간 이메일 중복 확인
+    async function checkEmailReal(email) {
+      const checkResult = document.getElementById('emailCheck');
+      const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+
+      if (!email) {
+        checkResult.innerHTML = '이메일을 입력해주세요.';
+        checkResult.className = 'form-text text-danger';
+        isEmailAvailable = false;
+        return;
+      }
+
+      if (!emailRegex.test(email)) {
+        checkResult.innerHTML = '올바른 이메일 형식이 아닙니다.';
+        checkResult.className = 'form-text text-danger';
+        isEmailAvailable = false;
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/check-email?email=${encodeURIComponent(email)}`);
+        const data = await response.json();
+
+        if (data.available) {
+          checkResult.innerHTML = '사용 가능한 이메일입니다.';
+          checkResult.className = 'form-text text-success';
+          isEmailAvailable = true;
+        } else {
+          checkResult.innerHTML = '이미 사용중인 이메일입니다.';
+          checkResult.className = 'form-text text-danger';
+          isEmailAvailable = false;
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        checkResult.innerHTML = '중복 확인 중 오류가 발생했습니다.';
+        checkResult.className = 'form-text text-danger';
+        isEmailAvailable = false;
+      }
+    }
+
+    // 고객 목록 로드
+    async function loadCustomers() {
+      try {
+        const response = await fetch('/api/customer');
+        if (!response.ok) throw new Error('Failed to load customers');
+
+        const data = await response.json();
+        totalCustomers = Array.isArray(data) ? data : [];
+
+        displayCustomers(currentPage);
+        updatePagination();
+      } catch (error) {
+        console.error('Error:', error);
+        alert('고객 목록을 불러오는데 실패했습니다.');
+      }
+    }
+
+    // 고객 검색
+    async function searchCustomers() {
+      const searchType = document.getElementById('searchType').value;
+      const searchTerm = document.getElementById('searchInput').value.trim();
+
+      try {
+        let url = '/api/customer';
+        if (searchTerm) {
+          url += `?type=${searchType}&term=${encodeURIComponent(searchTerm)}`;
+        }
+
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Search failed');
+
+        const data = await response.json();
+        totalCustomers = Array.isArray(data) ? data : [];
+        currentPage = 1;
+
+        displayCustomers(currentPage);
+        updatePagination();
+      } catch (error) {
+        console.error('Error:', error);
+        alert('검색 중 오류가 발생했습니다.');
+      }
+    }
+
+    // 고객 목록 표시
+    function displayCustomers(page) {
+      const start = (page - 1) * itemsPerPage;
+      const end = start + itemsPerPage;
+      const paginatedCustomers = totalCustomers.slice(start, end);
+
+      const tbody = document.getElementById('customerTableBody');
+      tbody.innerHTML = '';
+
+      paginatedCustomers.forEach(customer => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${customer.id}</td>
+          <td>${customer.username}</td>
+          <td>${customer.name}</td>
+          <td>${customer.email}</td>
+          <td>
+            <button class="btn btn-sm btn-primary me-1" onclick="editCustomer(${customer.id})">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="btn btn-sm btn-danger" onclick="deleteCustomer(${customer.id})">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // 페이지네이션 업데이트
+    function updatePagination() {
+      const totalPages = Math.ceil(totalCustomers.length / itemsPerPage);
+      const pagination = document.getElementById('pagination');
+      pagination.innerHTML = '';
+
+      // 처음으로 버튼
+      const firstLi = document.createElement('li');
+      firstLi.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+      firstLi.innerHTML = `
+        <a class="page-link" href="#" onclick="changePage(1)">
+          <i class="fas fa-angle-double-left"></i>
+        </a>
+      `;
+      pagination.appendChild(firstLi);
+
+      // 이전 페이지 버튼
+      const prevLi = document.createElement('li');
+      prevLi.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+      prevLi.innerHTML = `
+        <a class="page-link" href="#" onclick="changePage(${currentPage - 1})">
+          <i class="fas fa-angle-left"></i>
+        </a>
+      `;
+      pagination.appendChild(prevLi);
+
+      // 페이지 번호 (최대 7개)
+      let startPage = Math.max(1, currentPage - 3);
+      let endPage = Math.min(totalPages, startPage + 6);
+
+      // 끝부분 처리
+      if (endPage - startPage < 6) {
+        startPage = Math.max(1, endPage - 6);
+      }
+
+      for (let i = startPage; i <= endPage; i++) {
+        const li = document.createElement('li');
+        li.className = `page-item ${currentPage === i ? 'active' : ''}`;
+        li.innerHTML = `
+          <a class="page-link" href="#" onclick="changePage(${i})">${i}</a>
+        `;
+        pagination.appendChild(li);
+      }
+
+      // 다음 페이지 버튼
+      const nextLi = document.createElement('li');
+      nextLi.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
+      nextLi.innerHTML = `
+        <a class="page-link" href="#" onclick="changePage(${currentPage + 1})">
+          <i class="fas fa-angle-right"></i>
+        </a>
+      `;
+      pagination.appendChild(nextLi);
+
+      // 마지막으로 버튼
+      const lastLi = document.createElement('li');
+      lastLi.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
+      lastLi.innerHTML = `
+        <a class="page-link" href="#" onclick="changePage(${totalPages})">
+          <i class="fas fa-angle-double-right"></i>
+        </a>
+      `;
+      pagination.appendChild(lastLi);
+    }
+
+    // 페이지 변경
+    function changePage(page) {
+      if (page < 1 || page > Math.ceil(totalCustomers.length / itemsPerPage)) return;
+      currentPage = page;
+      displayCustomers(currentPage);
+      updatePagination();
+    }
+
+    // 고객 정렬
+    function sortCustomers(field) {
+      const header = document.querySelector(`[data-sort="${field}"]`);
+      const isAsc = !header.classList.contains('asc');
+
+      // 모든 헤더의 정렬 클래스 제거
+      document.querySelectorAll('.sortable').forEach(h => {
+        h.classList.remove('asc', 'desc');
+      });
+
+      // 현재 헤더에 정렬 클래스 추가
+      header.classList.add(isAsc ? 'asc' : 'desc');
+
+      totalCustomers.sort((a, b) => {
+        const aVal = a[field];
+        const bVal = b[field];
+
+        if (typeof aVal === 'string') {
+          return isAsc ?
+            aVal.localeCompare(bVal) :
+            bVal.localeCompare(aVal);
+        }
+        return isAsc ? aVal - bVal : bVal - aVal;
+      });
+
+      displayCustomers(currentPage);
+    }
+
+    // 추가 모달 초기화
+    function cancelAdd() {
+      document.getElementById('addUsername').value = '';
+      document.getElementById('addPassword').value = '';
+      document.getElementById('addName').value = '';
+      document.getElementById('addEmail').value = '';
+      document.getElementById('usernameCheck').innerHTML = '';
+      document.getElementById('emailCheck').innerHTML = '';
+      isUsernameAvailable = false;
+      isEmailAvailable = false;
+      const modal = bootstrap.Modal.getInstance(document.getElementById('addModal'));
+      if (modal) modal.hide();
+    }
+
+    // 고객 추가
+    async function addCustomer() {
+      const username = document.getElementById('addUsername').value.trim();
+      const password = document.getElementById('addPassword').value.trim();
+      const name = document.getElementById('addName').value.trim();
+      const email = document.getElementById('addEmail').value.trim();
+
+      if (!username || !password || !name || !email) {
+        alert('모든 필수 항목을 입력해주세요.');
+        return;
+      }
+
+      if (!isUsernameAvailable || !isEmailAvailable) {
+        alert('아이디와 이메일 중복 확인이 필요합니다.');
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/customer', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            username,
+            password,
+            name,
+            email
+          })
+        });
+
+        if (!response.ok) throw new Error('Failed to add customer');
+
+        const data = await response.json();
+        if (data.success) {
+          alert('고객이 추가되었습니다.');
+          cancelAdd();
+          loadCustomers();
+        } else {
+          alert('고객 추가에 실패했습니다.');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('고객 추가 중 오류가 발생했습니다.');
+      }
+    }
+
+    // 고객 수정 모달 열기
+    function editCustomer(id) {
+      const customer = totalCustomers.find(c => c.id === id);
+      if (customer) {
+        originalCustomerData = { ...customer };
+        document.getElementById('editId').value = customer.id;
+        document.getElementById('editUsername').value = customer.username;
+        document.getElementById('editName').value = customer.name;
+        document.getElementById('editEmail').value = customer.email;
+        const modal = new bootstrap.Modal(document.getElementById('editModal'));
+        modal.show();
+      }
+    }
+
+    // 수정 시 이메일 실시간 검증
+    async function checkEditEmailReal(email) {
+      const checkResult = document.getElementById('editEmailCheck');
+      const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+
+      if (!email) {
+        checkResult.innerHTML = '이메일을 입력해주세요.';
+        checkResult.className = 'form-text text-danger';
+        return false;
+      }
+
+      if (!emailRegex.test(email)) {
+        checkResult.innerHTML = '올바른 이메일 형식이 아닙니다.';
+        checkResult.className = 'form-text text-danger';
+        return false;
+      }
+
+      // 원래 이메일과 같으면 중복 체크 스킵
+      if (email === originalCustomerData.email) {
+        checkResult.innerHTML = '사용 가능한 이메일입니다.';
+        checkResult.className = 'form-text text-success';
+        return true;
+      }
+
+      try {
+        const response = await fetch(`/api/check-email?email=${encodeURIComponent(email)}`);
+        const data = await response.json();
+
+        if (data.available) {
+          checkResult.innerHTML = '사용 가능한 이메일입니다.';
+          checkResult.className = 'form-text text-success';
+          return true;
+        } else {
+          checkResult.innerHTML = '이미 사용중인 이메일입니다.';
+          checkResult.className = 'form-text text-danger';
+          return false;
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        checkResult.innerHTML = '중복 확인 중 오류가 발생했습니다.';
+        checkResult.className = 'form-text text-danger';
+        return false;
+      }
+    }
+
+    // updateCustomer 함수 수정
+    async function updateCustomer() {
+      const id = document.getElementById('editId').value;
+      const name = document.getElementById('editName').value.trim();
+      const email = document.getElementById('editEmail').value.trim();
+
+      if (!name || !email) {
+        alert('모든 필수 항목을 입력해주세요.');
+        return;
+      }
+
+      // 이메일 유효성 검사
+      if (!await checkEditEmailReal(email)) {
+        alert('올바른 이메일을 입력해주세요.');
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/customer/${id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            name,
+            email
+          })
+        });
+
+        if (!response.ok) throw new Error('Failed to update customer');
+
+        const data = await response.json();
+        if (data.success) {
+          alert('고객 정보가 수정되었습니다.');
+          const modal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
+          modal.hide();
+          loadCustomers();
+        } else {
+          alert('고객 정보 수정에 실패했습니다.');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('고객 정보 수정 중 오류가 발생했습니다.');
+      }
+    }
+
+    // 고객 삭제
+    async function deleteCustomer(id) {
+      if (!confirm('정말로 이 고객을 삭제하시겠습니까?')) return;
+
+      try {
+        const response = await fetch(`/api/customer/${id}`, {
+          method: 'DELETE'
+        });
+
+        if (!response.ok) throw new Error('Failed to delete customer');
+
+        const data = await response.json();
+        if (data.success) {
+          alert('고객이 삭제되었습니다.');
+          loadCustomers();
+        } else {
+          alert('고객 삭제에 실패했습니다.');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('고객 삭제 중 오류가 발생했습니다.');
+      }
+    }
+
+    // 세션 체크
+    function checkSession() {
+      fetch('/api/check-session')
+        .then(response => {
+          if (!response.ok) {
+            window.location.href = '/login';
+          }
+        })
+        .catch(() => {
+          window.location.href = '/login';
+        });
+    }
+
+    // 페이지 로드 및 포커스 시 세션 체크
+    document.addEventListener('DOMContentLoaded', checkSession);
+    window.addEventListener('focus', checkSession);
+
+    // 뒤로가기 감지 및 세션 체크
+    window.addEventListener('pageshow', function (event) {
+      if (event.persisted) {
+        checkSession();
+      }
+    });
+  </script>
+</body>
+
+</html>

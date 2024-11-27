@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>호텔 관리 시스템</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+
+        .login-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            max-width: 500px;
+            width: 90%;
+            margin: 0 auto;
+            padding: 0;
+        }
+
+        .login-header {
+            background: linear-gradient(to right, #1e3c72, #2a5298);
+            padding: 30px 20px;
+            text-align: center;
+            color: white;
+        }
+
+        .login-header i {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        .login-header h3 {
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .login-body {
+            padding: 40px 30px;
+        }
+
+        .form-control {
+            border-radius: 10px;
+            padding: 12px;
+            border: 2px solid #e1e1e1;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #1e3c72;
+            box-shadow: 0 0 0 0.2rem rgba(30, 60, 114, 0.25);
+        }
+
+        .btn-login {
+            background: linear-gradient(to right, #1e3c72, #2a5298);
+            border: none;
+            border-radius: 10px;
+            padding: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        .input-group-text {
+            background: transparent;
+            border: 2px solid #e1e1e1;
+            border-right: none;
+            border-radius: 10px 0 0 10px;
+        }
+
+        .input-group .form-control {
+            border-left: none;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .signup-link {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #eee;
+        }
+
+        .signup-link a {
+            color: #1e3c72;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .signup-link a:hover {
+            color: #2a5298;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="login-container">
+                    <div class="login-header">
+                        <i class="fas fa-hotel"></i>
+                        <h3>호텔 관리 시스템</h3>
+                        <p class="mb-0">환영합니다</p>
+                    </div>
+                    <div class="login-body">
+                        <form action="/login" method="post" id="loginForm">
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-user"></i>
+                                </span>
+                                <input type="text" class="form-control" id="username" name="username"
+                                    placeholder="아이디를 입력하세요" required>
+                            </div>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-lock"></i>
+                                </span>
+                                <input type="password" class="form-control" id="password" name="password"
+                                    placeholder="비밀번호를 입력하세요" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-login w-100">
+                                로그인 <i class="fas fa-sign-in-alt ms-2"></i>
+                            </button>
+                        </form>
+                    </div>
+                    <div class="signup-link">
+                        계정이 없으신가요? <a href="/signup">회원가입</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const loginForm = document.getElementById("loginForm");
+
+        loginForm.addEventListener("submit", (event) => {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+
+            if (!username || !password) {
+                event.preventDefault();
+                alert("아이디와 비밀번호를 모두 입력해 주세요.");
+            }
+        });
+
+        // URL 파라미터에서 에러 확인
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('error') === 'true') {
+            alert('아이디 또는 비밀번호가 잘못되었습니다.');
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>객실 상세 정보</title>
+    <style>
+        .room-detail-container {
+            max-width: 900px;
+            margin: 20px auto;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            background: linear-gradient(45deg, #1e3c72, #2a5298);
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+            padding: 1rem 1.5rem;
+        }
+
+        .btn-link {
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-link:hover {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .section {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .section-title {
+            color: #1e3c72;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #1e3c72;
+            display: inline-block;
+        }
+
+        .info-item {
+            margin-bottom: 1rem;
+        }
+
+        .info-item label {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
+            display: block;
+        }
+
+        .info-item p {
+            margin: 0;
+            font-weight: 500;
+        }
+
+        .facility-item {
+            margin-bottom: 0.8rem;
+            color: #555;
+        }
+
+        .facility-item i {
+            width: 25px;
+            color: #1e3c72;
+        }
+
+        .facility-item span {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .notes-container {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        .history-container {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .badge {
+            padding: 0.5em 1em;
+            font-size: 0.9em;
+        }
+
+        /* 스크롤바 스타일링 */
+        .history-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .history-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .history-container::-webkit-scrollbar-thumb {
+            background: #1e3c72;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="room-detail-container">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">객실 상세 정보</h5>
+                <button class="btn btn-link" onclick="closeDetail()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="card-body">
+                <!-- 기본 정보 섹션 -->
+                <div class="section">
+                    <h6 class="section-title">기본 정보</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <label>객실 번호</label>
+                                <p id="detailRoomNumber"></p>
+                            </div>
+                            <div class="info-item">
+                                <label>객실 유형</label>
+                                <p id="detailRoomType"></p>
+                            </div>
+                            <div class="info-item">
+                                <label>현재 상태</label>
+                                <span id="detailStatus" class="badge"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <label>최근 청소일</label>
+                                <p id="detailLastCleaning"></p>
+                            </div>
+                            <div class="info-item">
+                                <label>최근 점검일</label>
+                                <p id="detailLastInspection"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 시설 정보 섹션 -->
+                <div class="section">
+                    <h6 class="section-title">시설 정보</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="facility-item">
+                                <i class="fas fa-bed"></i> 침대 타입: <span>퀸 사이즈</span>
+                            </div>
+                            <div class="facility-item">
+                                <i class="fas fa-tv"></i> TV: <span>43인치 스마트 TV</span>
+                            </div>
+                            <div class="facility-item">
+                                <i class="fas fa-wifi"></i> 와이파이: <span>사용 가능</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="facility-item">
+                                <i class="fas fa-bath"></i> 욕실 타입: <span>샤워부스</span>
+                            </div>
+                            <div class="facility-item">
+                                <i class="fas fa-temperature-low"></i> 에어컨: <span>있음</span>
+                            </div>
+                            <div class="facility-item">
+                                <i class="fas fa-smoking-ban"></i> 흡연: <span>금연</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 특이사항 섹션 -->
+                <div class="section">
+                    <h6 class="section-title">특이사항</h6>
+                    <div class="notes-container">
+                        <p id="detailNotes">특이사항이 없습니다.</p>
+                    </div>
+                </div>
+
+                <!-- 관리 이력 섹션 -->
+                <div class="section">
+                    <h6 class="section-title">최근 관리 이력</h6>
+                    <div class="history-container">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>날짜</th>
+                                    <th>구분</th>
+                                    <th>담당자</th>
+                                    <th>비고</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyTableBody">
+                                <!-- 이력 데이터는 JavaScript로 동적 추가 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function closeDetail() {
+            document.getElementById('detailContent').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+        }
+
+        // 이력 데이터 예시
+        const historyData = [
+            { date: '2024-03-21', type: '청소', staff: '김철수', note: '정기 청소' },
+            { date: '2024-03-20', type: '점검', staff: '박영희', note: '에어컨 필터 교체' },
+            { date: '2024-03-18', type: '수리', staff: '이민수', note: 'TV 리모컨 배터리 교체' }
+        ];
+
+        // 이력 테이블 데이터 추가
+        function loadHistoryData() {
+            const tbody = document.getElementById('historyTableBody');
+            tbody.innerHTML = historyData.map(item => `
+                <tr>
+                    <td>${item.date}</td>
+                    <td>${item.type}</td>
+                    <td>${item.staff}</td>
+                    <td>${item.note}</td>
+                </tr>
+            `).join('');
+        }
+
+        // 페이지 로드 시 이력 데이터 로드
+        document.addEventListener('DOMContentLoaded', loadHistoryData);
+    </script>
+</body>
+</html> 

@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>호텔 대시보드</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    body {
+      overflow-x: hidden;
+      background-color: #f8f9fa;
+    }
+
+    .page-wrapper {
+      min-height: 100vh;
+      padding: 20px 40px;
+      background-color: #f8f9fa;
+    }
+
+    .main-content {
+      margin-left: 250px;
+      padding-top: 40px;
+      transition: margin-left 0.3s ease;
+    }
+
+    .hotel-floor {
+      margin-bottom: 20px;
+      border: 1px solid #ddd;
+      padding: 10px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .floor-title {
+      margin-bottom: 10px;
+      font-weight: bold;
+      color: #333;
+      border-bottom: 2px solid #007bff;
+      padding-bottom: 5px;
+    }
+
+    .room {
+      border: 1px solid #ddd;
+      padding: 10px;
+      margin: 5px;
+      border-radius: 5px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .room:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .room.available {
+      background-color: #d4edda;
+      border-color: #c3e6cb;
+    }
+
+    .room.occupied {
+      background-color: #f8d7da;
+      border-color: #f5c6cb;
+    }
+
+    .room.maintenance {
+      background-color: #fff3cd;
+      border-color: #ffeeba;
+    }
+
+    .room-number {
+      font-size: 1.2em;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .room-type {
+      font-size: 0.9em;
+      color: #666;
+    }
+
+    .stats-card {
+      background: white;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .stats-number {
+      font-size: 2em;
+      font-weight: bold;
+      color: #007bff;
+    }
+
+    .stats-label {
+      color: #666;
+      font-size: 0.9em;
+    }
+
+    .container-fluid {
+      max-width: 1800px;
+      margin: 0 auto;
+    }
+
+    .toggle-sidebar {
+      display: none;
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 1001;
+    }
+
+    /* 모바일 대응 */
+    @media (max-width: 991.98px) {
+      .page-wrapper {
+        padding: 15px 20px;
+      }
+
+      .main-content {
+        margin-left: 0;
+        padding-top: 40px;
+      }
+
+      .toggle-sidebar {
+        display: block !important;
+      }
+    }
+
+    .detail-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .detail-content {
+      background: white;
+      width: 90%;
+      max-width: 900px;
+      max-height: 90vh;
+      overflow-y: auto;
+      border-radius: 15px;
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateY(-20px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- 사이드바가 로드될 컨테이너 -->
+  <div id="sidebarContainer"></div>
+
+  <!-- 전체 컨텐츠를 감싸는 wrapper -->
+  <div class="page-wrapper">
+    <!-- 메인 컨텐츠 -->
+    <div class="main-content">
+      <div class="container-fluid">
+        <!-- 통계 카드 -->
+        <div class="row mb-4">
+          <div class="col-md-3">
+            <div class="stats-card">
+              <div class="stats-number" id="totalRooms">0</div>
+              <div class="stats-label">전체 객실</div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="stats-card">
+              <div class="stats-number text-success" id="availableRooms">0</div>
+              <div class="stats-label">이용 가능</div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="stats-card">
+              <div class="stats-number text-danger" id="occupiedRooms">0</div>
+              <div class="stats-label">사용 중</div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="stats-card">
+              <div class="stats-number text-warning" id="maintenanceRooms">0</div>
+              <div class="stats-label">점검 중</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 호텔 층별 표시 -->
+        <div id="hotelContainer">
+          <!-- 층별 객실이 여기에 동적으로 추가됩니다 -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 먼저 dashboard.html의 메인 컨텐츠 영역 끝에 컨테이너 추가 -->
+  <div id="roomDetailContainer" class="detail-overlay" style="display: none;">
+    <div class="detail-content">
+      <!-- 상세 정보가 여기에 로드됨 -->
+    </div>
+  </div>
+
+  <script>
+    function loadSidebar() {
+      fetch('/html/components/sidebar.html')
+        .then(response => response.text())
+        .then(html => {
+          document.getElementById('sidebarContainer').innerHTML = html;
+
+          // 스크립트 실행
+          const scriptContent = html.match(/<script id="sidebarScript">([\s\S]*?)<\/script>/);
+          if (scriptContent && scriptContent[1]) {
+            eval(scriptContent[1]);  // 스크립트 직접 실행
+
+            // 현재 페이지 메뉴 활성화
+            const dashboardLink = document.getElementById('nav-dashboard');
+            if (dashboardLink) {
+              dashboardLink.classList.add('active');
+            }
+          }
+        })
+        .catch(error => console.error('Error loading sidebar:', error));
+    }
+
+    // 페이지 초기화
+    document.addEventListener('DOMContentLoaded', function () {
+      console.log('Dashboard page loaded');
+      loadSidebar();
+      loadRoomData();  // 객실 데이터 로드 추가
+    });
+
+    function loadRoomData() {
+      fetch('/api/room')
+        .then(response => response.json())
+        .then(rooms => {
+          updateStats(rooms);
+          displayHotelFloors(rooms);
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('객실 데이터를 불러오는데 실패했습니다.');
+        });
+    }
+
+    function updateStats(rooms) {
+      document.getElementById('totalRooms').textContent = rooms.length;
+      document.getElementById('availableRooms').textContent =
+        rooms.filter(room => room.status === 'available').length;
+      document.getElementById('occupiedRooms').textContent =
+        rooms.filter(room => room.status === 'occupied').length;
+      document.getElementById('maintenanceRooms').textContent =
+        rooms.filter(room => room.status === 'maintenance').length;
+    }
+
+    function displayHotelFloors(rooms) {
+      // 객실 번호로 정렬
+      rooms.sort((a, b) => a.roomNumber.localeCompare(b.roomNumber));
+
+      // 층별로 객실 그룹화
+      const floorGroups = {};
+      rooms.forEach(room => {
+        const floor = room.roomNumber.substring(0, 1);
+        if (!floorGroups[floor]) {
+          floorGroups[floor] = [];
+        }
+        floorGroups[floor].push(room);
+      });
+
+      // 호텔 컨테이너 초기화
+      const container = document.getElementById('hotelContainer');
+      container.innerHTML = '';
+
+      // 층별로 표시 (위에서부터 아래로)
+      Object.keys(floorGroups)
+        .sort((a, b) => b - a)
+        .forEach(floor => {
+          const floorDiv = document.createElement('div');
+          floorDiv.className = 'hotel-floor';
+
+          floorDiv.innerHTML = `
+            <div class="floor-title">${floor}층</div>
+            <div class="row">
+              ${floorGroups[floor].map(room => `
+                <div class="col-md-2">
+                  <div class="room ${room.status}" onclick="showRoomDetails('${room.roomNumber}')">
+                    <div class="room-number">${room.roomNumber}</div>
+                    <div class="room-type">${room.roomType}</div>
+                    <div class="room-status">${getStatusText(room.status)}</div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          `;
+
+          container.appendChild(floorDiv);
+        });
+    }
+
+    function getStatusText(status) {
+      switch (status) {
+        case 'available': return '이용 가능';
+        case 'occupied': return '사용 중';
+        case 'maintenance': return '점검 중';
+        default: return '상태 미정';
+      }
+    }
+
+    function showRoomDetails(roomNumber) {
+      // 상세정보 컨테이너 표시
+      const container = document.getElementById('roomDetailContainer');
+      const contentDiv = container.querySelector('.detail-content');
+
+      // 로딩 표시
+      contentDiv.innerHTML = '<div class="text-center p-5"><div class="spinner-border text-primary" role="status"></div></div>';
+      container.style.display = 'flex';
+
+      // roomDetail.html 로드
+      fetch(`/html/components/roomDetail.html`)
+        .then(response => response.text())
+        .then(html => {
+          contentDiv.innerHTML = html;
+
+          // 객실 정보 로드
+          fetch(`/api/room/${roomNumber}`)
+            .then(response => response.json())
+            .then(room => {
+              // 상세 정보 데이터 채우기
+              document.getElementById('detailRoomNumber').textContent = room.roomNumber;
+              document.getElementById('detailRoomType').textContent = room.roomType;
+
+              const statusElement = document.getElementById('detailStatus');
+              statusElement.textContent = getStatusText(room.status);
+              statusElement.className = `badge ${getStatusBadgeClass(room.status)}`;
+
+              // 기타 필요한 데이터 채우기
+              document.getElementById('detailLastCleaning').textContent = '2024-03-21';
+              document.getElementById('detailLastInspection').textContent = '2024-03-20';
+            });
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          contentDiv.innerHTML = '<div class="alert alert-danger m-3">데이터를 불러오는데 실패했습니다.</div>';
+        });
+    }
+
+    // 상세정보 닫기 함수 (roomDetail.html의 closeDetail 함수 수정)
+    function closeDetail() {
+      const container = document.getElementById('roomDetailContainer');
+      container.style.display = 'none';
+    }
+
+    // 오버레이 클릭 시 닫기
+    document.getElementById('roomDetailContainer').addEventListener('click', function (e) {
+      if (e.target === this) {
+        closeDetail();
+      }
+    });
+
+    // 페이지 로드 시 세션 체크
+    function checkSession() {
+      fetch('/api/check-session')
+        .then(response => {
+          if (!response.ok) {
+            window.location.href = '/login';
+          }
+        })
+        .catch(() => {
+          window.location.href = '/login';
+        });
+    }
+
+    // 페이지 로드 및 포커스 시 세션 체크
+    document.addEventListener('DOMContentLoaded', checkSession);
+    window.addEventListener('focus', checkSession);
+
+    // 뒤로가기 감지 및 세션 체크
+    window.addEventListener('pageshow', function (event) {
+      if (event.persisted) {
+        checkSession();
+      }
+    });
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
