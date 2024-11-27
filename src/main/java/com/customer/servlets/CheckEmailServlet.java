@@ -18,7 +18,7 @@ public class CheckEmailServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String email = req.getParameter("email");
         LOGGER.info("Received email check request for: " + email);
-        //
+
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
         
@@ -28,15 +28,14 @@ public class CheckEmailServlet extends HttpServlet {
             boolean isAvailable = DatabaseManager.getInstance().isEmailAvailable(email);
             response.put("available", isAvailable);
             LOGGER.info("Email check result - email: " + email + ", available: " + isAvailable);
-            System.out.println("Sending response: " + response.toString());
+            System.out.println("Sending response: " + response);
         } catch (SQLException e) {
             LOGGER.severe("Database error while checking email: " + e.getMessage());
-            e.printStackTrace();
             response.put("available", false);
             response.put("error", "데이터베이스 오류가 발생했습니다.");
         }
         
         resp.getWriter().write(response.toString());
-        LOGGER.info("Sent response: " + response.toString());
+        LOGGER.info("Sent response: " + response);
     }
 } 
