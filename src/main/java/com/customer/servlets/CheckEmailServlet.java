@@ -18,7 +18,7 @@ public class CheckEmailServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String email = req.getParameter("email");
         LOGGER.info("Received email check request for: " + email);
-        
+        //
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
         
