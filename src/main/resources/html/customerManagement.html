@@ -200,6 +200,175 @@
       /* 아이콘 너비 고정 */
       text-align: center;
     }
+
+    /* 예약 모달 스타일 */
+    #reservationModal .modal-content {
+      border: none;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    #reservationModal .modal-header {
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      border-radius: 15px 15px 0 0;
+      padding: 1rem 1.5rem;
+    }
+
+    #reservationModal .modal-title {
+      font-weight: 600;
+      font-size: 1.2rem;
+    }
+
+    #reservationModal .table {
+      margin-bottom: 0;
+      table-layout: fixed;
+      /* 추가: 테이블 레이아웃 고정 */
+      width: 100%;
+    }
+
+    #reservationModal .table th,
+    #reservationModal .table td {
+      padding: 12px 8px;
+      white-space: nowrap;
+      /* 추가: 텍스트 줄바꿈 방지 */
+      overflow: hidden;
+      /* 추가: 넘치는 텍스트 숨김 */
+      text-overflow: ellipsis;
+      /* 추가: 넘치는 텍스트에 ... 표시 */
+    }
+
+    #reservationModal .table th {
+      background-color: #f8f9fa;
+      border-bottom: 2px solid #dee2e6;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    #reservationModal .table td {
+      vertical-align: middle;
+      font-size: 0.95rem;
+    }
+
+    #reservationModal .table-hover tbody tr:hover {
+      background-color: #f8f9fa;
+    }
+
+    #noReservationMessage {
+      color: #6c757d;
+      padding: 2rem;
+    }
+
+    #noReservationMessage i {
+      color: #dee2e6;
+    }
+
+    #reservationModal .btn-secondary {
+      background-color: #6c757d;
+      border: none;
+      padding: 8px 20px;
+      font-weight: 500;
+    }
+
+    #reservationModal .btn-secondary:hover {
+      background-color: #5a6268;
+    }
+
+    #reservationModal .modal-footer {
+      border-top: 1px solid #eee;
+      padding: 1rem 1.5rem;
+    }
+
+    /* 예약 모달 스타일 추가 */
+    #reservationModal .modal-xl {
+      max-width: 1200px;
+      /* 모달 최대 너비 설정 */
+    }
+
+    #reservationModal .table td {
+      vertical-align: middle;
+      padding: 12px 8px;
+    }
+
+    #reservationModal .btn-action-group {
+      white-space: nowrap;
+    }
+
+    /* 관리 버튼 스타일 */
+    .reservation-actions .btn {
+      padding: 6px 12px;
+      margin: 0 2px;
+    }
+
+    .reservation-actions .btn i {
+      margin-right: 4px;
+    }
+
+    /* 모바일 대응 */
+    @media (max-width: 768px) {
+      #reservationModal .modal-dialog {
+        margin: 0.5rem;
+      }
+
+      #reservationModal .table th,
+      #reservationModal .table td {
+        font-size: 0.85rem;
+        padding: 8px 4px;
+      }
+    }
+
+    /* 버튼 스타일 수정 */
+    .btn-info {
+      background-color: #0dcaf0;
+      border-color: #0dcaf0;
+      color: white;
+      font-weight: 600;
+      /* 볼드체 추가 */
+      letter-spacing: -0.3px;
+      /* 자간 살짝 조정 */
+    }
+
+    .btn-info:hover {
+      background-color: #31d2f2;
+      border-color: #25cff2;
+      color: white;
+    }
+
+    /* 버튼 크기 조정 */
+    .btn-sm {
+      padding: 0.25rem 0.8rem;
+      /* 좌우 패딩 살짝 증가 */
+      font-size: 0.875rem;
+      line-height: 1.5;
+      border-radius: 0.2rem;
+    }
+
+    /* 사용 불가능한 객실 스타일 */
+    .room-unavailable {
+      color: #adb5bd;
+      font-style: italic;
+    }
+
+    .room-unavailable::after {
+      content: ' (선택 불가)';
+      font-size: 0.9em;
+    }
+
+    #editRoomSelect option:disabled {
+      background-color: #f8f9fa;
+    }
+
+    .room-unavailable {
+      color: #adb5bd !important;
+      font-style: italic;
+    }
+
+    #editRoomSelect option:disabled {
+      background-color: #f8f9fa;
+    }
+
+    #editRoomSelect option {
+      padding: 8px;
+    }
   </style>
 </head>
 
@@ -295,6 +464,73 @@
       </div>
     </div>
   </div>
+  <!-- 예약 확인 모달 수정 -->
+  <div class="modal fade" id="reservationModal" tabindex="-1" aria-labelledby="reservationModalLabel">
+    <div class="modal-dialog modal-dialog-centered modal-xl"> <!-- modal-lg에서 modal-xl로 변경 -->
+      <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title" id="reservationModalLabel"></h5>
+        </div>
+        <div class=" modal-body p-4">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th class="text-center" style="width: 10%">객실 호수</th>
+                  <th class="text-center" style="width: 10%">객실 타입</th>
+                  <th class="text-center" style="width: 18%">체크인</th>
+                  <th class="text-center" style="width: 18%">체크아웃</th>
+                  <th class="text-center" style="width: 24%">예약일시</th>
+                  <th class="text-center" style="width: 20%">관리</th>
+                </tr>
+              </thead>
+              <tbody id="reservationTableBody">
+              </tbody>
+            </table>
+            <div id="noReservationMessage" class="text-center py-4 text-muted d-none">
+              <i class="fas fa-calendar-times fa-2x mb-3"></i>
+              <p class="mb-0">예약 내역이 없습니다.</p>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeReservationModal()"
+            data-bs-dismiss="modal">닫기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- 예약 수정 모달 수정 -->
+  <div class="modal fade" id="editReservationModal" tabindex="-1" aria-labelledby="editReservationModalLabel">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title">예약 수정</h5>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="editReservationId">
+          <div class="mb-3">
+            <label class="form-label">객실 선택</label>
+            <select class="form-select" id="editRoomSelect">
+              <option value="">객실을 선택해주세요</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">체크인 날짜</label>
+            <input type="date" class="form-control" id="editCheckinDate">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">체크아웃 날짜</label>
+            <input type="date" class="form-control" id="editCheckoutDate">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+          <button type="button" class="btn btn-primary" onclick="updateReservation()">수정</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- 고객 수정 모달 -->
   <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel">
@@ -337,6 +573,440 @@
     let isEmailAvailable = false;
     let originalCustomerData = null;
 
+    // 예약 확인 모달 닫기 함수 추가
+    function closeReservationModal() {
+      if (currentModal) {
+        document.body.focus();
+        currentModal.hide();
+        currentModal = null;
+      }
+    }
+
+    // 예약 확인 모달 관리를 위한 전역 변수
+    let currentModal = null;
+
+    // 예약 확인 함수
+    async function checkReservation(customerId) {
+      try {
+        const response = await fetch(`/api/reservation/customer/${customerId}`);
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || '예약 정보를 불러올 수 없습니다.');
+        }
+
+        const reservations = await response.json();
+        currentReservations = reservations;
+
+        // 모달 요소 가져오기
+        const modalElement = document.getElementById('reservationModal');
+
+        // 테이블 내용 생성
+        const tableContent = `
+            <div class="table-responsive">
+                <table class="table table-hover" id="reservationTable">
+                    <thead>
+                        <tr>
+                            <th>객실 번호</th>
+                            <th>객실 타입</th>
+                            <th>체크인</th>
+                            <th>체크아웃</th>
+                            <th>예약일</th>>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${reservations.length === 0 ? `
+                            <tr>
+                                <td colspan="6" class="text-center">
+                                    <i class="fas fa-info-circle me-2"></i>예약 내역이 없습니다.
+                                </td>
+                            </tr>
+                        ` : reservations.map(reservation => `
+                            <tr>
+                                <td>${reservation.roomNumber}호</td>
+                                <td>${getRoomTypeText(reservation.roomType)}</td>
+                                <td>${formatDate(reservation.checkinDt)}</td>
+                                <td>${formatDate(reservation.checkoutDt)}</td>
+                                <td>${formatDate(reservation.reservationDt)}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+
+        modalElement.querySelector('.modal-body').innerHTML = tableContent;
+
+        const modal = new bootstrap.Modal(modalElement);
+        modal.show();
+
+      } catch (error) {
+        console.error('Error:', error);
+        alert('예약 정보를 불러오는데 실패했습니다: ' + error.message);
+      }
+    }
+    // 예약 수정 모달 열기
+    async function editReservationModal(reservationId) {
+      try {
+        console.log('Opening modal for reservation:', reservationId);
+
+        // 현재 예약 목록에서 해당 예약 찾기
+        const reservation = currentReservations.find(r => r.id === reservationId);
+
+        if (!reservation) {
+          console.error('Reservation not found:', reservationId);
+          throw new Error('예약 정보를 찾을 수 없습니다.');
+        }
+
+        console.log('Found reservation:', reservation);
+
+        // 모달 필드 설정
+        document.getElementById('editReservationId').value = reservationId;
+        document.getElementById('editCheckinDate').value = reservation.checkinDt.split(' ')[0];
+        document.getElementById('editCheckoutDate').value = reservation.checkoutDt.split(' ')[0];
+
+        // 기존 선택된 객실 번호 저장
+        const currentRoomNumber = reservation.roomNumber;
+        console.log('Current room number:', currentRoomNumber);
+
+        // 날짜 입력 필드에 이벤트 리스너 추가
+        const dateFields = ['editCheckinDate', 'editCheckoutDate'];
+        dateFields.forEach(fieldId => {
+          const element = document.getElementById(fieldId);
+          element.removeEventListener('change', updateAvailableRooms);
+          element.addEventListener('change', updateAvailableRooms);
+        });
+
+        // 사용 가능한 객실 목록 업데이트
+        await updateAvailableRooms();
+
+        // 현재 객실 선택
+        const roomSelect = document.getElementById('editRoomSelect');
+        if (roomSelect.querySelector(`option[value="${currentRoomNumber}"]`)) {
+          roomSelect.value = currentRoomNumber;
+        }
+
+        // 모달 표시
+        const modal = new bootstrap.Modal(document.getElementById('editReservationModal'));
+        modal.show();
+
+      } catch (error) {
+        console.error('Error in editReservationModal:', error);
+        alert('예약 수정 모달을 열 수 없습니다: ' + error.message);
+      }
+    }
+
+    // 날짜 유효성 검사
+    function isValidDateFormat(dateString) {
+      if (!dateString) return false;
+      const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+      return dateRegex.test(dateString);
+    }
+
+    // 수정 모달 열기 함수 분리
+    async function openEditModal(reservation) {
+      try {
+        // 날짜 형식 변환
+        const checkinDate = formatDateForInput(reservation.checkinDt);
+        const checkoutDate = formatDateForInput(reservation.checkoutDt);
+
+        console.log('Checking availability for:', {
+          checkinDate,
+          checkoutDate,
+          reservationId: reservation.id
+        });
+
+        // 객실 정보와 예약된 객실 정보 모두 가져오기
+        const [roomResponse, occupiedResponse] = await Promise.all([
+          fetch('/api/room'),
+          fetch(`/api/room/occupied?checkinDate=${checkinDate}&checkoutDate=${checkoutDate}&excludeReservationId=${reservation.id}`)
+        ]);
+
+        if (!roomResponse.ok || !occupiedResponse.ok) {
+          throw new Error('객실 정보를 불러올 수 없습니다.');
+        }
+
+        const [rooms, occupiedRooms] = await Promise.all([
+          roomResponse.json(),
+          occupiedResponse.json()
+        ]);
+
+        console.log('API responses:', {
+          rooms,
+          occupiedRooms
+        });
+
+        // 현재 수정 중인 예약의 객실은 선택 가능하도록 occupiedRooms에서 제외
+        const occupiedRoomNumbers = occupiedRooms
+          .filter(room => room.reservationId !== reservation.id)
+          .map(room => room.roomNumber);
+
+        // 객실 선택 옵션 생성
+        const roomSelect = document.getElementById('editRoomSelect');
+        roomSelect.innerHTML = '';
+
+        rooms.forEach(room => {
+          const option = document.createElement('option');
+          option.value = room.roomNumber;
+          option.textContent = `${room.roomNumber}호 (${getRoomTypeText(room.roomType)})`;
+
+          const isCurrentRoom = room.roomNumber === reservation.roomNumber;
+          const isOccupied = occupiedRoomNumbers.includes(room.roomNumber);
+
+          if (isCurrentRoom || !isOccupied) {
+            option.disabled = false;
+            if (isCurrentRoom) {
+              option.selected = true;
+            }
+          } else {
+            option.disabled = true;
+            option.textContent += ' (예약됨)';
+          }
+
+          roomSelect.appendChild(option);
+        });
+
+        // 수정 모달의 입력 필드 설정
+        document.getElementById('editReservationId').value = reservation.id;
+        document.getElementById('editCheckinDate').value = checkinDate;
+        document.getElementById('editCheckoutDate').value = checkoutDate;
+
+        // 수정 모달 열기
+        const editModal = document.getElementById('editReservationModal');
+        editModal.removeAttribute('aria-hidden');
+
+        const modal = new bootstrap.Modal(editModal);
+        modal.show();
+
+      } catch (error) {
+        console.error('Error:', error);
+        alert('수정 모달을 열 수 없습니다: ' + error.message);
+      }
+    }
+
+    // 날짜 변경 시 사용 가능한 객실 업데이트
+    async function updateAvailableRooms() {
+      try {
+        const checkinDate = document.getElementById('editCheckinDate').value;
+        const checkoutDate = document.getElementById('editCheckoutDate').value;
+        const reservationId = document.getElementById('editReservationId').value;
+
+        if (!checkinDate || !checkoutDate) {
+          console.log('날짜가 선택되지 않았습니다.');
+          return;
+        }
+
+        console.log('Checking availability for:', {
+          checkinDate,
+          checkoutDate,
+          reservationId
+        });
+
+        // 객실 정보와 예약된 객실 정보 가져오기
+        const response = await fetch(
+          `/api/room/occupied?` +
+          `checkinDate=${encodeURIComponent(checkinDate)}` +
+          `&checkoutDate=${encodeURIComponent(checkoutDate)}` +
+          `&excludeReservationId=${encodeURIComponent(reservationId)}`
+        );
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('Server response:', errorText);
+          throw new Error('객실 정보를 불러올 수 없습니다.');
+        }
+
+        const data = await response.json();
+        console.log('API response:', data);
+
+        // 객실 선택 드롭다운 업데이트
+        const roomSelect = document.getElementById('editRoomSelect');
+        const currentValue = roomSelect.value;
+
+        // 드롭다운 초기화
+        roomSelect.innerHTML = '<option value="">객실을 선택해주세요</option>';
+
+        // 객실 목록 생성
+        data.rooms.forEach(room => {
+          const option = document.createElement('option');
+          option.value = room.roomNumber;
+          option.textContent = `${room.roomNumber}호 (${getRoomTypeText(room.roomType)})`;
+
+          // 예약된 객실인지 확인
+          const isOccupied = data.occupiedRooms.some(
+            occupiedRoom => occupiedRoom.roomNumber === room.roomNumber
+          );
+
+          if (isOccupied) {
+            option.disabled = true;
+            option.textContent += ' (예약됨)';
+          }
+
+          // 현재 선택된 객실이면 선택 상태 유지
+          if (room.roomNumber === currentValue) {
+            option.selected = true;
+          }
+
+          roomSelect.appendChild(option);
+        });
+
+      } catch (error) {
+        console.error('Error in updateAvailableRooms:', error);
+        throw error;
+      }
+    }
+    // 예약 수정 함수
+    async function updateReservation() {
+      try {
+        const reservationId = document.getElementById('editReservationId').value;
+        const roomNumber = document.getElementById('editRoomSelect').value;
+        const checkinDate = document.getElementById('editCheckinDate').value;
+        const checkoutDate = document.getElementById('editCheckoutDate').value;
+
+        // 입력값 검증
+        if (!roomNumber || !checkinDate || !checkoutDate) {
+          alert('모든 필수 항목을 입력해주세요.');
+          return;
+        }
+
+        // 날짜 유효성 검사
+        if (new Date(checkinDate) >= new Date(checkoutDate)) {
+          alert('체크아웃 날짜는 체크인 날짜보다 뒤여야 합니다.');
+          return;
+        }
+
+        const response = await fetch(`/api/reservation/customer/${reservationId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            roomNumber: roomNumber,
+            checkinDt: checkinDate,
+            checkoutDt: checkoutDate
+          })
+        });
+
+        if (!response.ok) throw new Error('예약 수정에 실패했습니다.');
+
+        const result = await response.json();
+        if (result.success) {
+          alert('예약이 수정되었습니다.');
+
+          // 수정 모달 닫기
+          const editModal = document.getElementById('editReservationModal');
+          const modal = bootstrap.Modal.getInstance(editModal);
+
+          // 포커스 처리 및 모달 닫기
+          document.body.focus();
+          modal.hide();
+
+          // 예약 목록 새로고침
+          setTimeout(() => {
+            checkReservation(currentCustomerId);
+          }, 100);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert(error.message);
+      }
+    }
+    // 객실 타입 변환 함수
+    function getRoomTypeText(type) {
+      const roomTypes = {
+        'NORMAL': '일반',
+        'SUITE': '스위트',
+        'BUSINESS': '비즈니스',
+        'VIP': 'VIP'
+      };
+      return roomTypes[type] || type;
+    }
+
+    // 날짜를 input type="date"에 맞는 형식으로 변환
+    // 날짜 형식 변환 함수들
+    function formatDateForInput(dateString) {
+      try {
+        if (!dateString) return '';
+
+        // 날짜 문자열에서 시간 부분 제거
+        const datePart = dateString.split(' ')[0];
+
+        // YYYY-MM-DD 형식 확인
+        const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+        if (dateRegex.test(datePart)) {
+          return datePart;
+        }
+
+        console.log('Original date string:', dateString);
+        console.log('Parsed date part:', datePart);
+
+        // 다른 형식일 경우 수동으로 파싱
+        const parts = datePart.split('-');
+        if (parts.length === 3) {
+          const year = parts[0];
+          const month = parts[1].padStart(2, '0');
+          const day = parts[2].padStart(2, '0');
+          return `${year}-${month}-${day}`;
+        }
+
+        throw new Error('Unsupported date format');
+      } catch (error) {
+        console.error('Error formatting date:', error, dateString);
+        return '';
+      }
+    }
+
+
+    // 예약 삭제 처리
+    async function deleteReservation(reservationId) {
+      if (!confirm('정말로 이 예약을 삭제하시겠습니까?')) return;
+
+      try {
+        const response = await fetch(`/api/reservation/${reservationId}`, {
+          method: 'DELETE'
+        });
+
+        if (!response.ok) throw new Error('Failed to delete reservation');
+
+        const data = await response.json();
+        if (data.success) {
+          alert('예약이 삭제되었습니다.');
+          // 예약 목록 새로고침
+          checkReservation(currentCustomerId);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('예약 삭제에 실패했습니다.');
+      }
+    }
+
+    // 날짜 입력용 포맷 함수
+    function formatDateForInput(dateString) {
+      const date = new Date(dateString);
+      return date.toISOString().split('T')[0];
+    }
+    // 날짜 포맷 함수
+    function formatDate(dateString) {
+      if (!dateString) return '-';
+      const date = new Date(dateString);
+      return date.toLocaleDateString('ko-KR', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      });
+    }
+
+    // 날짜시간 포맷 함수
+    function formatDateTime(dateTimeString) {
+      if (!dateTimeString) return '-';
+      const date = new Date(dateTimeString);
+      return date.toLocaleString('ko-KR', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
     // 사이드바 로드 함수 수정
     function loadSidebar() {
       fetch('/html/components/sidebar.html')
@@ -380,6 +1050,9 @@
 
         // 모달 열기
         const modal = new bootstrap.Modal(document.getElementById('addModal'));
+        // 체크인/체크아웃 날짜 변경 이벤트 리스너
+        document.getElementById('editCheckinDate').addEventListener('change', updateAvailableRooms);
+        document.getElementById('editCheckoutDate').addEventListener('change', updateAvailableRooms);
         modal.show();
       });
     });
@@ -539,6 +1212,9 @@
           <td>${customer.name}</td>
           <td>${customer.email}</td>
           <td>
+            <button class="btn btn-sm btn-info me-1" onclick="checkReservation(${customer.id})">
+        예약 확인
+            </button>
             <button class="btn btn-sm btn-primary me-1" onclick="editCustomer(${customer.id})">
               <i class="fas fa-edit"></i>
             </button>

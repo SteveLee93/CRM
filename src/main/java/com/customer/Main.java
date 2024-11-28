@@ -5,6 +5,7 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.servlets.DefaultServlet;
 import com.customer.servlets.DashboardServlet;
 import com.customer.servlets.RoomManagementServlet;
+import com.customer.servlets.RoomOccupiedServlet;
 import com.customer.servlets.LoginServlet;
 import com.customer.servlets.MainServlet;
 import com.customer.servlets.AdminCheckServlet;
@@ -14,6 +15,7 @@ import com.customer.servlets.SessionCheckServlet;
 import com.customer.servlets.CheckUsernameServlet;
 import com.customer.servlets.CheckEmailServlet;
 import com.customer.servlets.CustomerManagementServlet;
+import com.customer.servlets.CustomerReservationServlet;
 import java.io.File;
 
 public class Main {
@@ -72,6 +74,13 @@ public class Main {
 		ctx.addServletMappingDecoded("/customer-management", "customerManagementServlet");
 		ctx.addServletMappingDecoded("/api/customer", "customerManagementServlet");
 		ctx.addServletMappingDecoded("/api/customer/*", "customerManagementServlet");
+
+		Tomcat.addServlet(ctx, "customerReservationServlet", new CustomerReservationServlet());
+		ctx.addServletMappingDecoded("/api/reservation/customer/*", "customerReservationServlet");
+
+		// RoomOccupiedServlet 추가
+		Tomcat.addServlet(ctx, "roomOccupiedServlet", new RoomOccupiedServlet());
+		ctx.addServletMappingDecoded("/api/room/occupied", "roomOccupiedServlet");
 
 		try {
 			tomcat.start();
