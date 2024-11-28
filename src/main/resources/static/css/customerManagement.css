@@ -1,0 +1,361 @@
+body {
+  overflow-x: hidden;
+  background-color: #f8f9fa;
+}
+
+.page-wrapper {
+  min-height: 100vh;
+  padding: 20px 40px;
+  background-color: #f8f9fa;
+}
+
+.main-content {
+  margin-left: 250px;
+  padding-top: 40px;
+  transition: margin-left 0.3s ease;
+}
+
+/* 카드 스타일 */
+.card {
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.card-header {
+  background: linear-gradient(45deg, #1e3c72, #2a5298);
+  color: white;
+  border-radius: 15px 15px 0 0 !important;
+  padding: 1rem 1.5rem;
+}
+
+/* 검색 입력창 스타일 */
+#searchInput {
+  min-width: 200px;
+}
+
+/* select 박스 스타일 */
+#searchType {
+  min-width: 50px;
+  width: auto;
+}
+
+/* input-group 전체 너비 */
+.input-group {
+  min-width: 300px;
+}
+
+/* 정렬 관련 스타일 */
+.sortable {
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  padding-right: 25px !important;
+  text-align: center !important;
+}
+
+.sortable i,
+.sortable::after {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.sortable i {
+  margin-left: 5px;
+  color: #ccc;
+  transition: all 0.2s ease;
+}
+
+/* 기본 정렬 아이콘 */
+.sortable i.fa-sort {
+  opacity: 0.3;
+}
+
+/* 오름차순 정렬 시 */
+.sortable.asc i.fa-sort {
+  display: none;
+}
+
+.sortable.asc::after {
+  content: '\f0d8';
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 900;
+  margin-left: 5px;
+  color: #1e3c72;
+}
+
+/* 내림차순 정렬 시 */
+.sortable.desc i.fa-sort {
+  display: none;
+}
+
+.sortable.desc::after {
+  content: '\f0d7';
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 900;
+  margin-left: 5px;
+  color: #1e3c72;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 991.98px) {
+  .main-content {
+    margin-left: 0;
+  }
+
+  #sidebarContainer {
+    display: none;
+  }
+}
+
+/* 사이드바 관련 스타일 추가 */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 250px;
+  background: linear-gradient(45deg, #1e3c72, #2a5298);
+  z-index: 1000;
+  transition: all 0.3s ease;
+}
+
+.sidebar.collapsed {
+  margin-left: -250px;
+}
+
+.main-content {
+  margin-left: 250px;
+  transition: margin-left 0.3s ease;
+}
+
+.main-content.expanded {
+  margin-left: 0;
+}
+
+@media (max-width: 991.98px) {
+  .main-content {
+    margin-left: 0;
+  }
+
+  .sidebar {
+    margin-left: -250px;
+  }
+
+  .sidebar.show {
+    margin-left: 0;
+  }
+}
+
+/* 사이드바 관련 스타일 수정 */
+.toggle-sidebar {
+  display: none;
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 1001;
+}
+
+/* 모바일 대응 */
+@media (max-width: 991.98px) {
+  .page-wrapper {
+    padding: 15px 20px;
+  }
+
+  .main-content {
+    margin-left: 0;
+    padding-top: 40px;
+  }
+
+  .toggle-sidebar {
+    display: block !important;
+  }
+}
+
+/* 페이지네이션 버튼 스타일 추가 */
+.pagination .page-link {
+  min-width: 36px;
+  /* 두 자리 숫자를 기준으로 한 너비 */
+  text-align: center;
+  padding: 6px 6px;
+  /* 좌우 패딩 조정 */
+}
+
+/* 처음/마지막 버튼의 아이콘 정렬 */
+.pagination .page-link i {
+  display: inline-block;
+  width: 14px;
+  /* 아이콘 너비 고정 */
+  text-align: center;
+}
+
+/* 예약 모달 스타일 */
+#reservationModal .modal-content {
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+#reservationModal .modal-header {
+  background: linear-gradient(135deg, #1e3c72, #2a5298);
+  border-radius: 15px 15px 0 0;
+  padding: 1rem 1.5rem;
+}
+
+#reservationModal .modal-title {
+  font-weight: 600;
+  font-size: 1.2rem;
+}
+
+#reservationModal .table {
+  margin-bottom: 0;
+  table-layout: fixed;
+  /* 추가: 테이블 레이아웃 고정 */
+  width: 100%;
+}
+
+#reservationModal .table th,
+#reservationModal .table td {
+  padding: 12px 8px;
+  white-space: nowrap;
+  /* 추가: 텍스트 줄바꿈 방지 */
+  overflow: hidden;
+  /* 추가: 넘치는 텍스트 숨김 */
+  text-overflow: ellipsis;
+  /* 추가: 넘치는 텍스트에 ... 표시 */
+}
+
+#reservationModal .table th {
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #dee2e6;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+#reservationModal .table td {
+  vertical-align: middle;
+  font-size: 0.95rem;
+}
+
+#reservationModal .table-hover tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+#noReservationMessage {
+  color: #6c757d;
+  padding: 2rem;
+}
+
+#noReservationMessage i {
+  color: #dee2e6;
+}
+
+#reservationModal .btn-secondary {
+  background-color: #6c757d;
+  border: none;
+  padding: 8px 20px;
+  font-weight: 500;
+}
+
+#reservationModal .btn-secondary:hover {
+  background-color: #5a6268;
+}
+
+#reservationModal .modal-footer {
+  border-top: 1px solid #eee;
+  padding: 1rem 1.5rem;
+}
+
+/* 예약 모달 스타일 추가 */
+#reservationModal .modal-xl {
+  max-width: 1200px;
+  /* 모달 최대 너비 설정 */
+}
+
+#reservationModal .table td {
+  vertical-align: middle;
+  padding: 12px 8px;
+}
+
+#reservationModal .btn-action-group {
+  white-space: nowrap;
+}
+
+/* 관리 버튼 스타일 */
+.reservation-actions .btn {
+  padding: 6px 12px;
+  margin: 0 2px;
+}
+
+.reservation-actions .btn i {
+  margin-right: 4px;
+}
+
+/* 모바일 대응 */
+@media (max-width: 768px) {
+  #reservationModal .modal-dialog {
+    margin: 0.5rem;
+  }
+
+  #reservationModal .table th,
+  #reservationModal .table td {
+    font-size: 0.85rem;
+    padding: 8px 4px;
+  }
+}
+
+/* 버튼 스타일 수정 */
+.btn-info {
+  background-color: #0dcaf0;
+  border-color: #0dcaf0;
+  color: white;
+  font-weight: 600;
+  /* 볼드체 추가 */
+  letter-spacing: -0.3px;
+  /* 자간 살짝 조정 */
+}
+
+.btn-info:hover {
+  background-color: #31d2f2;
+  border-color: #25cff2;
+  color: white;
+}
+
+/* 버튼 크기 조정 */
+.btn-sm {
+  padding: 0.25rem 0.8rem;
+  /* 좌우 패딩 살짝 증가 */
+  font-size: 0.875rem;
+  line-height: 1.5;
+  border-radius: 0.2rem;
+}
+
+/* 사용 불가능한 객실 스타일 */
+.room-unavailable {
+  color: #adb5bd;
+  font-style: italic;
+}
+
+.room-unavailable::after {
+  content: ' (선택 불가)';
+  font-size: 0.9em;
+}
+
+#editRoomSelect option:disabled {
+  background-color: #f8f9fa;
+}
+
+.room-unavailable {
+  color: #adb5bd !important;
+  font-style: italic;
+}
+
+#editRoomSelect option:disabled {
+  background-color: #f8f9fa;
+}
+
+#editRoomSelect option {
+  padding: 8px;
+}

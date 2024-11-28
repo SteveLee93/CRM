@@ -1,0 +1,124 @@
+.sidebar {
+  width: 250px;
+  height: 100vh;
+  background: linear-gradient(180deg, #1e3c72 0%, #2a5298 100%);
+  color: white;
+  position: fixed;
+  left: 0;
+  top: 0;
+  padding-top: 0;
+  z-index: 1000;
+  box-shadow: 4px 0 15px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.sidebar-header {
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 1.5rem;
+}
+
+.sidebar-header h4 {
+  margin: 0;
+  font-size: 1.4rem;
+  letter-spacing: 0.5px;
+  padding-left: 15px;
+}
+
+#sidebarToggle {
+  position: fixed;
+  left: 10px;
+  top: 10px;
+  z-index: 1001;
+  background: linear-gradient(45deg, #1e3c72, #2a5298);
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+}
+
+#sidebarToggle i {
+  transition: transform 0.3s ease;
+}
+
+.sidebar.collapsed~#sidebarToggle i {
+  transform: rotate(180deg);
+}
+
+@media (max-width: 991.98px) {
+  #sidebarToggle {
+    left: 10px;
+  }
+
+  .sidebar.show~#sidebarToggle i {
+    transform: rotate(180deg);
+  }
+}
+
+.nav-link {
+  text-decoration: none !important;
+  color: rgba(255, 255, 255, 0.8) !important;
+  padding: 0.8rem 1.5rem;
+  border-radius: 0;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+}
+
+.nav-link:hover {
+  color: white !important;
+  background: rgba(255, 255, 255, 0.1);
+  padding-left: 2rem;
+}
+
+.nav-link.active {
+  color: white !important;
+  background: rgba(255, 255, 255, 0.15);
+  border-left: 4px solid white;
+  padding-left: calc(1.5rem - 4px);
+}
+
+.nav-link i {
+  width: 20px;
+  margin-right: 10px;
+  font-size: 1.1rem;
+}
+
+.nav-link span {
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.sidebar.collapsed {
+  transform: translateX(-250px);
+}
+
+.main-content {
+  margin-left: 250px;
+  transition: margin-left 0.3s ease;
+  padding: 20px;
+}
+
+.main-content.expanded {
+  margin-left: 0;
+}
+
+@media (max-width: 991.98px) {
+  .sidebar {
+    transform: translateX(-250px);
+  }
+
+  .sidebar.show {
+    transform: translateX(0);
+  }
+
+  .main-content {
+    margin-left: 0;
+  }
+}

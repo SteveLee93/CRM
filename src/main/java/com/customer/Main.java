@@ -30,12 +30,21 @@ public class Main {
 		String docBase = new File("src/main/resources").getAbsolutePath();
 		Context ctx = tomcat.addContext("", docBase);
 
+		// Tomcat.addServlet(ctx, "defaultServlet", new DefaultServlet());
+		// ctx.addServletMappingDecoded("/", "defaultServlet");
+		// ctx.addServletMappingDecoded("/html/*", "defaultServlet");
+		// ctx.addServletMappingDecoded("/components/*", "defaultServlet");
+		// ctx.addServletMappingDecoded("/images/*", "defaultServlet");
+
+		// static 리소스 매핑 추가
 		Tomcat.addServlet(ctx, "defaultServlet", new DefaultServlet());
 		ctx.addServletMappingDecoded("/", "defaultServlet");
 		ctx.addServletMappingDecoded("/html/*", "defaultServlet");
-		ctx.addServletMappingDecoded("/components/*", "defaultServlet");
+		ctx.addServletMappingDecoded("/static/*", "defaultServlet"); // static 폴더 매핑 추가
+		ctx.addServletMappingDecoded("/css/*", "defaultServlet"); // css 직접 매핑
+		ctx.addServletMappingDecoded("/js/*", "defaultServlet"); // js 직접 매핑
 		ctx.addServletMappingDecoded("/images/*", "defaultServlet");
-
+		ctx.addServletMappingDecoded("/components/*", "defaultServlet");
 		Tomcat.addServlet(ctx, "mainServlet", new MainServlet());
 		ctx.addServletMappingDecoded("/", "mainServlet");
 

@@ -16,11 +16,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-@WebServlet("/reservation")
+@WebServlet("api/reservation")
 public class ReservationServlet extends HttpServlet {
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response)
-          throws IOException {
+      throws IOException {
     response.setContentType("application/json");
     response.setCharacterEncoding("UTF-8");
 
@@ -59,9 +59,10 @@ public class ReservationServlet extends HttpServlet {
       response.getWriter().write(error.toString());
     }
   }
+
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response)
-          throws IOException {
+      throws IOException {
 
     BufferedReader reader = request.getReader();
     StringBuilder sb = new StringBuilder();

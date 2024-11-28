@@ -135,7 +135,6 @@ public class CustomerReservationServlet extends HttpServlet {
         if (!rs.next()) {
           throw new SQLException("예약 정보를 찾을 수 없습니다.");
         }
-        String oldRoomNumber = rs.getString("room_number");
 
         // 2. 새로운 객실이 예약 가능한지 확인 - 쿼리 수정
         String checkAvailabilitySql = "SELECT COUNT(*) as count FROM reservation " +

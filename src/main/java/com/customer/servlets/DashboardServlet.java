@@ -15,7 +15,7 @@ import org.json.JSONArray;
 import com.customer.database.DatabaseManager;
 import jakarta.servlet.http.HttpSession;
 
-@WebServlet(urlPatterns = { "/dashboard", "/api/room" })
+@WebServlet(urlPatterns = { "/dashboard", "/api/room", "/static/*" })
 public class DashboardServlet extends HttpServlet {
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -27,6 +27,12 @@ public class DashboardServlet extends HttpServlet {
     }
 
     String pathInfo = req.getServletPath();
+
+    // static 리소스 요청 처리
+    if (pathInfo.startsWith("/static/")) {
+      handleStaticResource(req, resp);
+      return;
+    }
 
     // URL 패턴에 따라 다른 처리
     if ("/dashboard".equals(pathInfo)) {
@@ -77,5 +83,30 @@ public class DashboardServlet extends HttpServlet {
     resp.setContentType("application/json");
     resp.setCharacterEncoding("UTF-8");
     resp.getWriter().write(error.toString());
+  }
+
+  // static 리소스 처리 메서드 추가
+  private void handleStaticResource(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    String fileName = req.getServletPath();
+    try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(fileName.substring(1))) {
+      if (inputStream != null) {
+        // Content-Type 설정
+        if (fileName.endsWith(".css")) {
+          resp.setContentType("text/css");
+        } else if (fileName.endsWith(".js")) {
+          resp.setContentType("application/javascript");
+        }
+        resp.setCharacterEncoding("UTF-8");
+
+        // 파일 내용 전송
+        byte[] buffer = new byte[1024];
+        int bytesRead;
+        while ((bytesRead = inputStream.read(buffer)) != -1) {
+          resp.getOutputStream().write(buffer, 0, bytesRead);
+        }
+      } else {
+        resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+      }
+    }
   }
 }

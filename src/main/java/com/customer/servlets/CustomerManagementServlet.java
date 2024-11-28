@@ -17,12 +17,21 @@ import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.logging.Logger;
 
-@WebServlet(urlPatterns = { "/customer-management", "/api/customer", "/api/customer/*", "/api/check-username", "/api/check-email" })
+@WebServlet(urlPatterns = { "/customer-management", "/api/customer", "/api/customer/*", "/api/check-username",
+    "/api/check-email", "/static/*" })
 public class CustomerManagementServlet extends HttpServlet {
   private static final Logger LOGGER = Logger.getLogger(CustomerManagementServlet.class.getName());
 
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    String pathInfo = req.getServletPath();
+
+    // static 리소스 요청 처리
+    if (pathInfo.startsWith("/static/")) {
+      handleStaticResource(req, resp);
+      return;
+    }
+
     // 세션 체크
     HttpSession session = req.getSession(false);
     if (session == null || session.getAttribute("username") == null) {
@@ -30,7 +39,6 @@ public class CustomerManagementServlet extends HttpServlet {
       return;
     }
 
-    String pathInfo = req.getServletPath();
     String searchType = req.getParameter("type");
     String searchTerm = req.getParameter("term");
 
@@ -102,43 +110,43 @@ public class CustomerManagementServlet extends HttpServlet {
   private void handleAddCustomer(HttpServletRequest req, HttpServletResponse resp) throws IOException {
     req.setCharacterEncoding("UTF-8");
     resp.setCharacterEncoding("UTF-8");
-    
+
     StringBuilder sb = new StringBuilder();
     try (BufferedReader reader = new BufferedReader(
-            new InputStreamReader(req.getInputStream(), StandardCharsets.UTF_8))) {
-        String line;
-        while ((line = reader.readLine()) != null) {
-            sb.append(line);
-        }
+        new InputStreamReader(req.getInputStream(), StandardCharsets.UTF_8))) {
+      String line;
+      while ((line = reader.readLine()) != null) {
+        sb.append(line);
+      }
     }
 
     try {
-        JSONObject customerData = new JSONObject(sb.toString());
-        LOGGER.info("Received customer data: " + customerData.toString());
-        
-        String email = customerData.getString("email");
-        if (!isValidEmail(email)) {
-            JSONObject response = new JSONObject();
-            response.put("success", false);
-            response.put("error", "올바른 이메일 형식이 아닙니다.");
-            resp.setContentType("application/json");
-            resp.getWriter().write(response.toString());
-            return;
-        }
-        
-        boolean success = DatabaseManager.getInstance().addCustomer(customerData);
-        
+      JSONObject customerData = new JSONObject(sb.toString());
+      LOGGER.info("Received customer data: " + customerData.toString());
+
+      String email = customerData.getString("email");
+      if (!isValidEmail(email)) {
         JSONObject response = new JSONObject();
-        response.put("success", success);
-        
+        response.put("success", false);
+        response.put("error", "올바른 이메일 형식이 아닙니다.");
         resp.setContentType("application/json");
         resp.getWriter().write(response.toString());
+        return;
+      }
+
+      boolean success = DatabaseManager.getInstance().addCustomer(customerData);
+
+      JSONObject response = new JSONObject();
+      response.put("success", success);
+
+      resp.setContentType("application/json");
+      resp.getWriter().write(response.toString());
     } catch (SQLException e) {
-        LOGGER.severe("SQL Error in handleAddCustomer: " + e.getMessage());
-        handleError(resp, e);
+      LOGGER.severe("SQL Error in handleAddCustomer: " + e.getMessage());
+      handleError(resp, e);
     } catch (Exception e) {
-        LOGGER.severe("Unexpected error in handleAddCustomer: " + e.getMessage());
-        handleError(resp, e);
+      LOGGER.severe("Unexpected error in handleAddCustomer: " + e.getMessage());
+      handleError(resp, e);
     }
   }
 
@@ -203,46 +211,46 @@ public class CustomerManagementServlet extends HttpServlet {
     // 인코딩 설정 추가
     req.setCharacterEncoding("UTF-8");
     resp.setCharacterEncoding("UTF-8");
-    
+
     HttpSession session = req.getSession(false);
     if (session == null || session.getAttribute("username") == null) {
-        resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        return;
+      resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+      return;
     }
 
     String pathInfo = req.getPathInfo();
     LOGGER.info("Received PUT request with pathInfo: " + pathInfo);
 
     if (pathInfo != null && pathInfo.length() > 1) {
-        try {
-            StringBuilder sb = new StringBuilder();
-            try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader(req.getInputStream(), StandardCharsets.UTF_8))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    sb.append(line);
-                }
-            }
-
-            // ID 파싱
-            int userId = Integer.parseInt(pathInfo.substring(1));
-            JSONObject customerData = new JSONObject(sb.toString());
-            customerData.put("id", userId);
-
-            // 고객 정보 업데이트
-            boolean success = DatabaseManager.getInstance().updateCustomer(customerData);
-
-            // 응답 생성
-            JSONObject response = new JSONObject();
-            response.put("success", success);
-
-            resp.setContentType("application/json");
-            resp.getWriter().write(response.toString());
-        } catch (SQLException e) {
-            handleError(resp, e);
+      try {
+        StringBuilder sb = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(
+            new InputStreamReader(req.getInputStream(), StandardCharsets.UTF_8))) {
+          String line;
+          while ((line = reader.readLine()) != null) {
+            sb.append(line);
+          }
         }
+
+        // ID 파싱
+        int userId = Integer.parseInt(pathInfo.substring(1));
+        JSONObject customerData = new JSONObject(sb.toString());
+        customerData.put("id", userId);
+
+        // 고객 정보 업데이트
+        boolean success = DatabaseManager.getInstance().updateCustomer(customerData);
+
+        // 응답 생성
+        JSONObject response = new JSONObject();
+        response.put("success", success);
+
+        resp.setContentType("application/json");
+        resp.getWriter().write(response.toString());
+      } catch (SQLException e) {
+        handleError(resp, e);
+      }
     } else {
-        resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+      resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
     }
   }
 
@@ -256,5 +264,30 @@ public class CustomerManagementServlet extends HttpServlet {
     resp.getWriter().write(error.toString());
 
     LOGGER.severe("Error handled: " + e.getMessage());
+  }
+
+  // static 리소스 처리 메서드 추가
+  private void handleStaticResource(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    String fileName = req.getServletPath();
+    try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(fileName.substring(1))) {
+      if (inputStream != null) {
+        // Content-Type 설정
+        if (fileName.endsWith(".css")) {
+          resp.setContentType("text/css");
+        } else if (fileName.endsWith(".js")) {
+          resp.setContentType("application/javascript");
+        }
+        resp.setCharacterEncoding("UTF-8");
+
+        // 파일 내용 전송
+        byte[] buffer = new byte[1024];
+        int bytesRead;
+        while ((bytesRead = inputStream.read(buffer)) != -1) {
+          resp.getOutputStream().write(buffer, 0, bytesRead);
+        }
+      } else {
+        resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+      }
+    }
   }
 }

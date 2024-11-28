@@ -1,0 +1,89 @@
+body {
+  overflow-x: hidden;
+  background-color: #f8f9fa;
+}
+
+.page-wrapper {
+  min-height: 100vh;
+  padding: 20px 40px;
+  background-color: #f8f9fa;
+}
+
+.main-content {
+  margin-left: 250px;
+  padding-top: 40px;
+  transition: margin-left 0.3s ease;
+}
+
+.room-table th,
+.room-table td {
+  vertical-align: middle;
+}
+
+/* 컨테이너 내부 여백 */
+.container-fluid {
+  max-width: 1800px;
+  margin: 0 auto;
+}
+
+/* 모바일 대응 */
+@media (max-width: 991.98px) {
+  .page-wrapper {
+    padding: 15px 20px;
+  }
+
+  .main-content {
+    margin-left: 0;
+    padding-top: 40px;
+  }
+}
+
+.card {
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  border: none;
+  margin-bottom: 1rem;
+}
+
+.card-body {
+  padding: 1.25rem;
+}
+
+.card-title {
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.card-text {
+  margin-bottom: 0;
+  font-weight: 700;
+}
+
+canvas {
+  max-height: 300px;
+}
+
+.input-group {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.input-group-text {
+  background-color: #fff;
+  border-right: none;
+}
+
+#roomSearch {
+  border-left: none;
+}
+
+#roomSearch:focus {
+  box-shadow: none;
+}
+
+.btn-outline-secondary {
+  border-left: none;
+}
+
+#searchInfo {
+  margin-bottom: 1rem;
+}

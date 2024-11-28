@@ -93,31 +93,28 @@ public class DatabaseManager {
     }
   }
 
-  public boolean updateRoom(String roomNumber, String roomType, String status, String cleaningStatus)
-      throws SQLException {
-    String sql = "UPDATE room SET room_type = ?, status = ?, cleaning_status = ? WHERE room_number = ?";
+  public boolean updateRoom(String roomNumber, String roomType, String status) throws SQLException {
+    String sql = "UPDATE room SET room_type = ?, status = ? WHERE room_number = ?";
 
     try (Connection conn = getConnection();
-        PreparedStatement stmt = conn.prepareStatement(sql)) {
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-      System.out.println("Updating room with parameters:");
-      System.out.println("Room Number: " + roomNumber);
-      System.out.println("Room Type: " + roomType);
-      System.out.println("Status: " + status);
-      System.out.println("Cleaning Status: " + cleaningStatus);
+        System.out.println("Updating room with parameters:");
+        System.out.println("Room Number: " + roomNumber);
+        System.out.println("Room Type: " + roomType);
+        System.out.println("Status: " + status);
 
-      stmt.setString(1, roomType);
-      stmt.setString(2, status);
-      stmt.setString(3, cleaningStatus);
-      stmt.setString(4, roomNumber);
+        stmt.setString(1, roomType);
+        stmt.setString(2, status);
+        stmt.setString(3, roomNumber);
 
-      int rowsAffected = stmt.executeUpdate();
-      System.out.println("Rows affected: " + rowsAffected);
-      return rowsAffected > 0;
+        int rowsAffected = stmt.executeUpdate();
+        System.out.println("Rows affected: " + rowsAffected);
+        return rowsAffected > 0;
     } catch (SQLException e) {
-      System.err.println("SQL Error: " + e.getMessage());
-      e.printStackTrace();
-      throw e;
+        System.err.println("SQL Error: " + e.getMessage());
+        e.printStackTrace();
+        throw e;
     }
   }
 
@@ -219,16 +216,6 @@ public class DatabaseManager {
       LOGGER.severe("Error retrieving customers: " + e.getMessage());
       e.printStackTrace();
       throw e;
-    }
-  }
-
-  public boolean updateCleaningStatus(String roomNumber, String cleaningStatus) throws SQLException {
-    String sql = "UPDATE room SET cleaning_status = ? WHERE room_number = ?";
-    try (Connection conn = getConnection();
-        PreparedStatement stmt = conn.prepareStatement(sql)) {
-      stmt.setString(1, cleaningStatus);
-      stmt.setString(2, roomNumber);
-      return stmt.executeUpdate() > 0;
     }
   }
 
@@ -368,6 +355,16 @@ public class DatabaseManager {
     } catch (SQLException e) {
       LOGGER.severe("Database error in isEmailAvailable: " + e.getMessage());
       throw e;
+    }
+  }
+  
+  public boolean updateRoomStatus(String roomNumber, String status) throws SQLException {
+    String sql = "UPDATE room SET status = ? WHERE room_number = ?";
+    try (Connection conn = getConnection();
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        pstmt.setString(1, status);
+        pstmt.setString(2, roomNumber);
+        return pstmt.executeUpdate() > 0;
     }
   }
 }
