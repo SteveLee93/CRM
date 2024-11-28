@@ -225,11 +225,12 @@ public class DatabaseManager {
   public boolean updateCleaningStatus(String roomNumber, String cleaningStatus) throws SQLException {
     String sql = "UPDATE room SET cleaning_status = ? WHERE room_number = ?";
     try (Connection conn = getConnection();
-         PreparedStatement stmt = conn.prepareStatement(sql)) {
+        PreparedStatement stmt = conn.prepareStatement(sql)) {
       stmt.setString(1, cleaningStatus);
       stmt.setString(2, roomNumber);
       return stmt.executeUpdate() > 0;
     }
+  }
 
   public JSONArray searchCustomers(String searchType, String searchTerm) throws SQLException {
     JSONArray results = new JSONArray();
