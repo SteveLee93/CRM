@@ -104,45 +104,37 @@ public class RoomManagementServlet extends HttpServlet {
     resp.setCharacterEncoding("UTF-8");
     
     try {
-        String pathInfo = req.getPathInfo();
-        
-        // 청소 상태 업데이트 요청 처리
-        if (pathInfo != null && pathInfo.contains("/cleaning-status")) {
-            String roomNumber = pathInfo.split("/")[1]; // /101/cleaning-status에서 101 추출
-            
-            StringBuilder buffer = new StringBuilder();
-            try (BufferedReader reader = req.getReader()) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    buffer.append(line);
-                }
+        // 요청 데이터 읽기
+        StringBuilder buffer = new StringBuilder();
+        try (BufferedReader reader = req.getReader()) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                buffer.append(line);
             }
-            
-            JSONObject jsonRequest = new JSONObject(buffer.toString());
-            String cleaningStatus = jsonRequest.getString("cleaningStatus");
-            
-            DatabaseManager db = DatabaseManager.getInstance();
-            boolean success = db.updateCleaningStatus(roomNumber, cleaningStatus);
-            
-            JSONObject response = new JSONObject();
-            response.put("success", success);
-            response.put("message", success ? "청소 상태가 업데이트되었습니다." : "청소 상태 업데이트에 실패했습니다.");
-            resp.getWriter().write(response.toString());
-            return;
         }
         
-        // 기존 객실 정보 업데이트 처리
-        // ... existing room update code ...
+        JSONObject jsonRequest = new JSONObject(buffer.toString());
+        System.out.println("Received update data: " + jsonRequest.toString()); // 디버깅용
+        
+        String roomNumber = jsonRequest.getString("roomNumber");
+        String roomType = jsonRequest.getString("roomType");
+        String status = jsonRequest.getString("status");
+        
+        DatabaseManager db = DatabaseManager.getInstance();
+        boolean success = db.updateRoom(roomNumber, roomType, status);
+        
+        JSONObject response = new JSONObject();
+        response.put("success", success);
+        response.put("message", success ? "객실이 수정되었습니다." : "객실 수정에 실패했습니다.");
+        resp.getWriter().write(response.toString());
+        
     } catch (Exception e) {
         System.err.println("Error in doPut: " + e.getMessage());
         e.printStackTrace();
-        
-        JSONObject errorResponse = new JSONObject();
-        errorResponse.put("success", false);
-        errorResponse.put("message", "서버 오류: " + e.getMessage());
-        
-        resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        resp.getWriter().write(errorResponse.toString());
+        JSONObject error = new JSONObject();
+        error.put("success", false);
+        error.put("message", "오류가 발생했습니다: " + e.getMessage());
+        resp.getWriter().write(error.toString());
     }
   }
 
