@@ -32,6 +32,7 @@ public class Main {
 		ctx.addServletMappingDecoded("/", "defaultServlet");
 		ctx.addServletMappingDecoded("/html/*", "defaultServlet");
 		ctx.addServletMappingDecoded("/components/*", "defaultServlet");
+		ctx.addServletMappingDecoded("/images/*", "defaultServlet");
 
 		Tomcat.addServlet(ctx, "mainServlet", new MainServlet());
 		ctx.addServletMappingDecoded("/", "mainServlet");
