@@ -108,7 +108,7 @@ public class RoomManagementServlet extends HttpServlet {
       if (db.roomExists(roomNumber)) {
         JSONObject response = new JSONObject();
         response.put("success", false);
-        response.put("message", "이미 존재하는 객실 번호���니다.");
+        response.put("message", "이미 존재하는 객실 번호입니다.");
         resp.getWriter().write(response.toString());
         return;
       }

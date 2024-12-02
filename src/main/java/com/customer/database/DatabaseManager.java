@@ -358,15 +358,7 @@ public class DatabaseManager {
     }
   }
   
-  public boolean updateRoomStatus(String roomNumber, String status) throws SQLException {
-    String sql = "UPDATE room SET status = ? WHERE room_number = ?";
-    try (Connection conn = getConnection();
-         PreparedStatement pstmt = conn.prepareStatement(sql)) {
-        pstmt.setString(1, status);
-        pstmt.setString(2, roomNumber);
-        return pstmt.executeUpdate() > 0;
-    }
-  }
+
 
   // 예약 관련 메서드 추가
   public JSONArray getReservations() throws SQLException {

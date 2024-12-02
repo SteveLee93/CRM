@@ -8,7 +8,7 @@ function loadSidebar() {
       // 스크립트 실행
       const scriptContent = html.match(/<script id="sidebarScript">([\s\S]*?)<\/script>/);
       if (scriptContent && scriptContent[1]) {
-        eval(scriptContent[1]);  // 스크립트 직접 실행
+        eval(scriptContent[1]);
 
         // 현재 페이지 메뉴 활성화
         const dashboardLink = document.getElementById('nav-dashboard');
@@ -20,61 +20,27 @@ function loadSidebar() {
     .catch(error => console.error('Error loading sidebar:', error));
 }
 
-function checkAndUpdateRoomStatus() {
-  // 현재 날짜 가져오기
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);  // 시간을 00:00:00으로 설정
-
-  // 모든 예약된 방에 대해 체크
-  fetch('/api/reservations/active')  // 현재 이용중인 예약 목록 조회
-    .then(response => response.json())
-    .then(reservations => {
-      reservations.forEach(reservation => {
-        const checkoutDate = new Date(reservation.checkoutDt);
-        const nextDay = new Date(checkoutDate);
-        nextDay.setDate(checkoutDate.getDate() + 1);
-        nextDay.setHours(0, 0, 0, 0);
-
-        // 오늘이 체크아웃 다음날인 경우
-        if (today.getTime() === nextDay.getTime()) {
-          // 방 상태를 '점검중'으로 업데이트
-          fetch('/api/room', {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json; charset=utf-8'
-            },
-            body: JSON.stringify({
-              roomNumber: reservation.roomNumber,
-              status: 'maintenance'
-            })
-          })
-            .then(response => response.json())
-            .then(data => {
-              if (data.success) {
-                console.log(`Room ${reservation.roomNumber} status updated to maintenance`);
-                // 필요한 경우 UI 업데이트
-                updateRoomStatusUI(reservation.roomNumber, 'maintenance');
-              }
-            })
-            .catch(error => console.error('Error updating room status:', error));
-        }
-      });
-    })
-    .catch(error => console.error('Error checking reservations:', error));
-}
-
 // 페이지 초기화
 document.addEventListener('DOMContentLoaded', function () {
+  // 현재 날짜 표시
+  const now = new Date();
+  const options = {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    weekday: 'long'
+  };
+  document.getElementById('currentDate').textContent = now.toLocaleDateString('ko-KR', options);
+
   console.log('Dashboard page loaded');
   loadSidebar();
   loadRoomData().then(rooms => {
     initializeFloorButtons(rooms);
-    checkAndUpdateRoomStatus();
   })
     .catch(error => {
       console.error('Error initializing dashboard:', error);
     });
-  loadMyReservations();
+
 });
 
 function loadRoomData() {
@@ -83,7 +49,20 @@ function loadRoomData() {
     .then(rooms => {
       roomData = rooms;
       updateStats(rooms);
-      displayHotelFloors(rooms);
+      
+      // 2층 객실만 필터링하여 표시
+      const secondFloorRooms = rooms.filter(room => room.roomNumber.startsWith('2'));
+      displayHotelFloors(secondFloorRooms);
+
+      // 2층 버튼 활성화
+      const buttons = document.querySelectorAll('#floorButtons button');
+      buttons.forEach(button => {
+        button.classList.remove('active');
+        if (button.dataset.floor === '2') {
+          button.classList.add('active');
+        }
+      });
+
       return rooms;
     })
     .catch(error => {
@@ -97,8 +76,6 @@ function updateStats(rooms) {
   document.getElementById('totalRooms').textContent = rooms.length;
   document.getElementById('availableRooms').textContent =
     rooms.filter(room => room.status === 'available').length;
-  document.getElementById('occupiedRooms').textContent =
-    rooms.filter(room => room.status === 'occupied').length;
   document.getElementById('maintenanceRooms').textContent =
     rooms.filter(room => room.status === 'maintenance').length;
 }
@@ -132,13 +109,9 @@ function displayHotelFloors(rooms) {
         <div class="floor-title">${floor}층</div>
         <div class="row">
           ${floorGroups[floor].map(room => `
-            <div class="col-md-2">
-              <div class="room ${room.status}" onclick="showRoomDetails('${room.roomNumber}')">
+              <div class="room available" onclick="showRoomDetails('${room.roomNumber}')">
                 <div class="room-number">${room.roomNumber}</div>
-                <div class="room-type">${room.roomType}</div>
-                <div class="room-status">${getStatusText(room.status)}</div>
               </div>
-            </div>
           `).join('')}
         </div>
       `;
@@ -150,8 +123,6 @@ function displayHotelFloors(rooms) {
 function getStatusText(status) {
   switch (status) {
     case 'available': return '이용 가능';
-    case 'occupied': return '사용 중';
-    case 'reserved': return '예약됨';
     case 'maintenance': return '점검 중';
     default: return '상태 미정';
   }
@@ -161,10 +132,6 @@ function getStatusBadgeClass(status) {
   switch (status) {
     case 'available':
       return 'bg-success';
-    case 'occupied':
-      return 'bg-danger';
-    case 'reserved':
-      return 'bg-info';
     case 'maintenance':
       return 'bg-warning';
     default:
@@ -195,7 +162,6 @@ function showRoomDetails(roomNumber) {
     .then(html => {
       contentDiv.innerHTML = html;
 
-      // 저장된 데이터로 상세 정보 채우기
       document.getElementById('roomImage').src = '/images/room1.png';
       document.getElementById('detailRoomNumber').textContent = room.roomNumber;
       document.getElementById('detailRoomType').textContent = room.roomType;
@@ -206,15 +172,11 @@ function showRoomDetails(roomNumber) {
       // 예약하기 버튼에 이벤트 리스너 추가
       const reserveButton = contentDiv.querySelector('.btn-primary');
       if (reserveButton) {
-        if (room.status === 'available') {
-          reserveButton.style.display = 'inline-block';
-          reserveButton.onclick = function () {
-            const roomType = document.getElementById('detailRoomType').textContent;
-            window.location.href = `/html/reservation.html?roomNumber=${encodeURIComponent(roomNumber)}&roomType=${encodeURIComponent(roomType)}`;
-          };
-        } else {
-          reserveButton.style.display = 'none';
-        }
+        reserveButton.style.display = 'inline-block';
+        reserveButton.onclick = function () {
+          const roomType = document.getElementById('detailRoomType').textContent;
+          window.location.href = `/html/reservation.html?roomNumber=${encodeURIComponent(roomNumber)}&roomType=${encodeURIComponent(roomType)}`;
+        };
       }
     })
     .catch(error => {
@@ -225,7 +187,7 @@ function showRoomDetails(roomNumber) {
 
 // 상세정보 닫기 함수 (roomDetail.html의 closeDetail 함수 수정)
 function closeDetail() {
-  const container = document.getElementById('roomDetailContainer');
+  const container = document.getElementById('roomDetailContainer')
   container.style.display = 'none';
 }
 
@@ -264,16 +226,7 @@ window.addEventListener('pageshow', function (event) {
 function initializeFloorButtons(rooms) {
   const floors = [...new Set(rooms.map(room => room.roomNumber.substring(0, 1)))].sort();
   const buttonContainer = document.getElementById('floorButtons');
-  buttonContainer.innerHTML = ''; // 기존 버튼들 초기화
-
-  // 전체 버튼 추가
-  const allButton = document.createElement('button');
-  allButton.type = 'button';
-  allButton.className = 'btn btn-outline-primary active';
-  allButton.textContent = '전체';
-  allButton.dataset.floor = 'all';
-  allButton.onclick = () => filterByFloor('all');
-  buttonContainer.appendChild(allButton);
+  buttonContainer.innerHTML = '';
 
   floors.forEach(floor => {
     const button = document.createElement('button');
@@ -304,3 +257,144 @@ function filterByFloor(floor) {
 
   displayHotelFloors(filteredRooms);
 }
+
+// 객실별 색상을 저장할 객체
+const roomColors = {};
+const usedColors = [];
+
+// 사용되지 않은 색상 중에서 랜덤하게 선택하는 함수
+function getUnusedRandomColor() {
+  // 모든 색상이 사용된 경우 초기화
+  if (usedColors.length >= eventColors.length) {
+    usedColors.length = 0;
+  }
+
+  // 사용되지 않은 색상들 필터링
+  const availableColors = eventColors.filter(color => !usedColors.includes(color));
+
+  // 사용되지 않은 색상 중 랜덤 선택
+  const randomIndex = Math.floor(Math.random() * availableColors.length);
+  const selectedColor = availableColors[randomIndex];
+
+  // 선택된 색상을 사용된 색상 배열에 추가
+  usedColors.push(selectedColor);
+
+  return selectedColor;
+}
+
+// 달력 초기화
+document.addEventListener('DOMContentLoaded', function () {
+  const calendarEl = document.getElementById('calendar');
+  if (!calendarEl) {
+    console.error('Calendar element not found');
+    return;
+  }
+
+  const calendar = new FullCalendar.Calendar(calendarEl, {
+    initialView: 'dayGridMonth',
+    headerToolbar: {
+      left: 'prev,next today',
+      center: 'title',
+      right: 'dayGridMonth,dayGridWeek'
+    },
+    locale: 'ko',
+    height: 'auto',
+    contentHeight: 600,
+    navLinks: false,
+    fixedWeekCount: false,
+    dayCellContent: function (arg) {
+      return arg.dayNumberText.replace('일', '');
+    },
+    dayCellDidMount: function (arg) {
+      if (arg.isToday) {
+        arg.el.style.backgroundColor = 'rgba(255, 100, 100, .15)';
+      }
+    },
+    eventDidMount: function (arg) {
+      arg.el.style.borderRadius = '10px';
+    },
+    events: function (info, successCallback, failureCallback) {
+      fetch('/api/reservation/all')
+        .then(response => response.json())
+        .then(data => {
+          const events = data.map(reservation => {
+            if (!roomColors[reservation.roomNumber]) {
+              roomColors[reservation.roomNumber] = getUnusedRandomColor();
+            }
+
+            const checkoutDate = new Date(reservation.checkoutDt);
+            checkoutDate.setDate(checkoutDate.getDate() + 1);
+
+            return {
+              title: `${reservation.roomNumber}호 - ${reservation.name}`,
+              start: reservation.checkinDt,
+              end: checkoutDate.toISOString().split('T')[0],
+              backgroundColor: roomColors[reservation.roomNumber],
+              borderColor: roomColors[reservation.roomNumber],
+              extendedProps: {
+                roomNumber: reservation.roomNumber,
+                roomType: reservation.roomType
+              }
+            };
+          });
+          successCallback(events);
+        })
+        .catch(error => {
+          console.error('Error fetching reservations:', error);
+          failureCallback(error);
+        });
+    }
+  });
+  calendar.render();
+  console.log('Calendar initialized');
+});
+
+// 예약 상세 정보 표시
+function showReservationDetails(event) {
+  const props = event.extendedProps;
+  const content = `
+        <div class="reservation-details">
+            <h4>예약 상세 정보</h4>
+            <p>객실 번호: ${props.roomNumber}</p>
+            <p>객실 타입: ${props.roomType}</p>
+            <p>체크인: ${event.start.toLocaleDateString()}</p>
+            <p>체크아웃: ${event.end.toLocaleDateString()}</p>
+            <p>상태: ${getStatusText(props.status)}</p>
+        </div>
+    `;
+
+  // 상세 정보 모달 표시
+  const detailContainer = document.getElementById('roomDetailContainer');
+  detailContainer.querySelector('.detail-content').innerHTML = content;
+  detailContainer.style.display = 'block';
+}
+
+// 새 예약 폼 표시
+function showNewReservationForm(date) {
+  window.location.href = `/html/reservation.html?date=${date.toISOString().split('T')[0]}`;
+}
+
+const eventColors = [
+  '#FF8080',
+  '#80B380',
+  '#8080FF',
+  '#FFB380',
+  '#B380B3',
+  '#80B3B3',
+  '#FF80FF',
+  '#FFB380',
+  '#80B380',
+  '#FF80B3',
+  '#8080B3',
+  '#FF9980',
+  '#80B3B3',
+  '#B39980',
+  '#8099E6',
+  '#E69980',
+  '#80B3B3',
+  '#B380FF',
+  '#E68080',
+  '#80B399',
+  '#B3B380',
+  '#E6B380'
+];

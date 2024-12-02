@@ -5,17 +5,16 @@ body {
 
 .page-wrapper {
   min-height: 100vh;
-  padding: 20px 40px;
-  background-color: #f8f9fa;
+  transition: margin-left 0.3s;
 }
 
 .main-content {
-  margin-left: 250px;
   padding-top: 40px;
   transition: margin-left 0.3s ease;
 }
 
 .hotel-floor {
+  width: 100%;
   margin-bottom: 20px;
   border: 1px solid #ddd;
   padding: 10px;
@@ -34,8 +33,9 @@ body {
 }
 
 .room {
+  flex: 0 0 100px;
   border: 1px solid #ddd;
-  padding: 10px;
+  padding: 15px;
   margin: 5px;
   border-radius: 5px;
   text-align: center;
@@ -44,7 +44,7 @@ body {
 }
 
 .room:hover {
-  transform: translateY(-2px);
+  transform: translateY(-5px);
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
@@ -58,6 +58,11 @@ body {
   border-color: #f5c6cb;
 }
 
+.room.reserved {
+  background-color: #cce5ff;
+  border-color: #b8daff;
+}
+
 .room.maintenance {
   background-color: #fff3cd;
   border-color: #ffeeba;
@@ -66,31 +71,34 @@ body {
 .room-number {
   font-size: 1.2em;
   font-weight: bold;
-  margin-bottom: 5px;
 }
 
-.room-type {
-  font-size: 0.9em;
-  color: #666;
+.stats-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 20px;
 }
 
 .stats-card {
+  flex: 1;
   background: white;
-  border-radius: 10px;
-  padding: 15px;
-  margin-bottom: 20px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  text-align: center;
 }
 
 .stats-number {
-  font-size: 2em;
+  font-size: 1.3em;
   font-weight: bold;
   color: #007bff;
+  margin-bottom: 5px;
 }
 
 .stats-label {
   color: #666;
-  font-size: 0.9em;
+  font-size: 0.8em;
 }
 
 .container-fluid {
@@ -104,22 +112,6 @@ body {
   top: 10px;
   left: 10px;
   z-index: 1001;
-}
-
-/* 모바일 대응 */
-@media (max-width: 991.98px) {
-  .page-wrapper {
-    padding: 15px 20px;
-  }
-
-  .main-content {
-    margin-left: 0;
-    padding-top: 40px;
-  }
-
-  .toggle-sidebar {
-    display: block !important;
-  }
 }
 
 .detail-overlay {
@@ -144,6 +136,10 @@ body {
   overflow-y: auto;
   border-radius: 15px;
   animation: slideIn 0.3s ease;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 @keyframes fadeIn {
@@ -168,21 +164,174 @@ body {
   }
 }
 
-/* 버튼 그룹 스타일 추가 */
 .btn-group {
   display: flex;
-  gap: 10px;
+  justify-content: center;
+  gap: 80px;
   flex-wrap: wrap;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
+  width: 100%;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .btn-group .btn {
-  margin: 5px;
-  min-width: 80px;
-  border-radius: 5px !important;
+  padding: 8px;
+  min-width: 45px;
+  font-size: 1.2rem;
+  border-radius: 4px !important;
+  margin: 2px;
 }
 
 .btn-group .btn.active {
   background-color: #0d6efd;
   color: white;
+}
+
+.room-button {
+  width: 120px;
+  margin: 5px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  text-align: center;
+}
+
+.room-button:hover {
+  opacity: 0.9;
+  cursor: pointer;
+  transform: scale(1.05);
+  transition: all 0.2s ease;
+}
+
+.page-wrapper {
+  margin-left: 260px;
+  min-height: 100vh;
+  transition: margin-left 0.3s;
+}
+
+.stats-card {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+}
+
+.stats-card:hover {
+  transform: translateY(-5px);
+}
+
+.stats-number {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.stats-label {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.hotel-container {
+  margin-top: 1rem;
+}
+
+.hotel-floor {
+  background: white;
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.floor-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: #343a40;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .page-wrapper {
+    margin-left: 0;
+  }
+
+  .stats-card {
+    margin-bottom: 1rem;
+  }
+
+  .stats-number {
+    font-size: 1.5rem;
+  }
+}
+
+/* 객실 상세 정보 모달 */
+.detail-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* 반응형 처리 */
+@media (max-width: 991.98px) {
+  .stats-container {
+    flex-wrap: wrap;
+  }
+
+  .stats-card {
+    flex: 0 0 calc(50% - 5px);
+  }
+}
+
+@media (max-width: 576px) {
+  .stats-card {
+    flex: 0 0 100%;
+  }
+}
+
+/* 방 버튼 컨테이너 */
+.room-container {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  padding: 10px;
+}
+
+/* 달력 컨테이너 스타일 */
+#calendar {
+  margin: 20px auto;
+  max-width: 1200px;
+  min-height: 600px;
+  background: white;
+  padding: 20px;
+}
+
+/* 달력 날짜 링크 스타일 제거 */
+.fc-daygrid-day-number {
+  color: inherit;
+  text-decoration: none;
+  pointer-events: none;
+}
+
+/* 요일 헤더 링크 스타일 제거 */
+.fc-col-header-cell-cushion {
+  color: inherit;
+  text-decoration: none;
+  pointer-events: none;
+}
+
+/* 반응형 조정 */
+@media (max-width: 768px) {
+  #calendar {
+    min-height: 400px;
+  }
 }
