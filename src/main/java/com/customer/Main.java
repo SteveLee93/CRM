@@ -4,18 +4,19 @@ import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.servlets.DefaultServlet;
 import com.customer.servlets.DashboardServlet;
+import com.customer.servlets.LoginServlet;
+import com.customer.servlets.LogoutServlet;
+import com.customer.servlets.MainServlet;
 import com.customer.servlets.RoomManagementServlet;
 import com.customer.servlets.RoomOccupiedServlet;
-import com.customer.servlets.LoginServlet;
-import com.customer.servlets.MainServlet;
-import com.customer.servlets.AdminCheckServlet;
-import com.customer.servlets.SignupServlet;
-import com.customer.servlets.LogoutServlet;
 import com.customer.servlets.SessionCheckServlet;
-import com.customer.servlets.CheckUsernameServlet;
+import com.customer.servlets.SignupServlet;
+import com.customer.servlets.AdminCheckServlet;
 import com.customer.servlets.CheckEmailServlet;
+import com.customer.servlets.CheckUsernameServlet;
 import com.customer.servlets.CustomerManagementServlet;
 import com.customer.servlets.CustomerReservationServlet;
+import com.customer.servlets.ReservationStatusPage.ReservationStatusServlet;
 import java.io.File;
 
 public class Main {
@@ -86,6 +87,11 @@ public class Main {
 
 		Tomcat.addServlet(ctx, "customerReservationServlet", new CustomerReservationServlet());
 		ctx.addServletMappingDecoded("/api/reservation/customer/*", "customerReservationServlet");
+
+		// ReservationStatusServlet 추가
+		Tomcat.addServlet(ctx, "reservationStatusServlet", new ReservationStatusServlet());
+		ctx.addServletMappingDecoded("/reservationStatus", "reservationStatusServlet");
+		ctx.addServletMappingDecoded("/api/reservations", "reservationStatusServlet");
 
 		// RoomOccupiedServlet 추가
 		Tomcat.addServlet(ctx, "roomOccupiedServlet", new RoomOccupiedServlet());

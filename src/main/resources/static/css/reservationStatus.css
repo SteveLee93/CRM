@@ -1,0 +1,166 @@
+body {
+    overflow-x: hidden;
+    background-color: #f8f9fa;
+}
+
+.page-wrapper {
+    min-height: 100vh;
+    padding: 20px 40px;
+    background-color: #f8f9fa;
+}
+
+.main-content {
+    margin-left: 250px;
+    padding-top: 40px;
+    transition: margin-left 0.3s ease;
+}
+
+.stats-card {
+    background: white;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stats-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.stats-card.active {
+    background-color: #f8f9fa;
+    border: 2px solid #007bff;
+}
+
+.stats-number {
+    font-size: 2em;
+    font-weight: bold;
+    color: #007bff;
+}
+
+.stats-label {
+    color: #666;
+    font-size: 0.9em;
+}
+
+.btn-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.btn-group .btn {
+    margin: 5px;
+    min-width: 80px;
+    border-radius: 5px !important;
+}
+
+.btn-group .btn.active {
+    background-color: #0d6efd;
+    color: white;
+}
+
+.table {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.table th {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.reservation-status {
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.9em;
+    font-weight: 500;
+}
+
+.status-active {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.status-upcoming {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.status-past {
+    background-color: #e2e3e5;
+    color: #383d41;
+}
+
+@media (max-width: 991.98px) {
+    .page-wrapper {
+        padding: 15px 20px;
+    }
+
+    .main-content {
+        margin-left: 0;
+        padding-top: 40px;
+    }
+}
+
+.pagination {
+    margin-bottom: 0;
+}
+
+.pagination .page-link {
+    min-width: 36px;
+    text-align: center;
+    padding: 6px 6px;
+    color: #007bff;
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: white;
+}
+
+.pagination .page-item.disabled .page-link {
+    color: #6c757d;
+    pointer-events: none;
+    background-color: #fff;
+    border-color: #dee2e6;
+}
+
+.pagination .page-link i {
+    display: inline-block;
+    width: 14px;
+    text-align: center;
+}
+
+/* 정렬 관련 스타일 */
+.sortable {
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    padding-right: 25px !important;
+}
+
+.sortable i {
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #999;
+}
+
+.sortable.asc i.fa-sort-up,
+.sortable.desc i.fa-sort-down {
+    color: #007bff;
+}
+
+.sortable i.fa-sort {
+    opacity: 0.3;
+} 

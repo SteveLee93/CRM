@@ -367,4 +367,28 @@ public class DatabaseManager {
         return pstmt.executeUpdate() > 0;
     }
   }
+
+  // 예약 관련 메서드 추가
+  public JSONArray getReservations() throws SQLException {
+    JSONArray reservations = new JSONArray();
+    String sql = "SELECT * FROM reservation ORDER BY reservation_dt DESC";
+
+    try (Connection conn = getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+        
+        ResultSet rs = stmt.executeQuery();
+        while (rs.next()) {
+            JSONObject reservation = new JSONObject();
+            reservation.put("id", rs.getInt("id"));
+            reservation.put("name", rs.getString("name"));
+            reservation.put("roomNumber", rs.getString("room_number"));
+            reservation.put("roomType", rs.getString("room_type"));
+            reservation.put("checkInDt", rs.getDate("checkin_dt").toString());
+            reservation.put("checkOutDt", rs.getDate("checkout_dt").toString());
+            reservation.put("reservationDt", rs.getTimestamp("reservation_dt").toString());
+            reservations.put(reservation);
+        }
+    }
+    return reservations;
+  }
 }
