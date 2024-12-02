@@ -8,6 +8,68 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <link href="/static/css/roomManagement.css" rel="stylesheet">
+  <style>
+    .room-details-container {
+      padding: 20px;
+    }
+
+    .room-image {
+      text-align: center;
+      background-color: #f8f9fa;
+      padding: 10px;
+      border-radius: 8px;
+    }
+
+    .room-image img {
+      max-height: 300px;
+      object-fit: cover;
+      width: 100%;
+    }
+
+    .room-details {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .info-item {
+      display: flex;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .info-item:last-child {
+      border-bottom: none;
+    }
+
+    .info-label {
+      min-width: 100px;
+      color: #495057;
+    }
+
+    .info-value {
+      margin-left: 20px;
+      color: #212529;
+      font-size: 1.1em;
+    }
+
+    #roomDetailModal .modal-content {
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    #roomDetailModal .modal-header {
+      background-color: #f8f9fa;
+      border-bottom: 1px solid #dee2e6;
+    }
+
+    #roomDetailModal .modal-footer {
+      background-color: #f8f9fa;
+      border-top: 1px solid #dee2e6;
+    }
+  </style>
 </head>
 
 <body>
@@ -157,9 +219,7 @@
               <label class="form-label">객실 상태</label>
               <select class="form-select" id="roomStatus" required>
                 <option value="available">이용 가능</option>
-                <option value="occupied">사용 중</option>
                 <option value="maintenance">점검 중</option>
-                <option value="reserved">예약됨</option>
               </select>
             </div>
           </form>
@@ -167,6 +227,42 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
           <button type="button" class="btn btn-primary" id="saveButton">저장</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 객실 상세 정보 모달 -->
+  <div class="modal fade" id="roomDetailModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">객실 상세 정보</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="room-details-container">
+            <div class="room-image mb-4">
+              <img id="roomImage" alt="객실 이미지" class="img-fluid rounded shadow">
+            </div>
+            <div class="room-details">
+              <div class="info-item mb-3">
+                <strong class="info-label">객실 번호:</strong>
+                <span id="detailRoomNumber" class="info-value"></span>
+              </div>
+              <div class="info-item mb-3">
+                <strong class="info-label">객실 유형:</strong>
+                <span id="detailRoomType" class="info-value"></span>
+              </div>
+              <div class="info-item mb-3">
+                <strong class="info-label">객실 상태:</strong>
+                <span id="detailStatus" class="info-value"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
         </div>
       </div>
     </div>

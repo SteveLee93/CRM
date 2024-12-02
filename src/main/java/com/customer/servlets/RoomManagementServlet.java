@@ -10,6 +10,12 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.io.BufferedReader;
 import java.sql.SQLException;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -21,6 +27,7 @@ public class RoomManagementServlet extends HttpServlet {
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
     String pathInfo = req.getServletPath();
+    String roomNumber = req.getPathInfo() != null ? req.getPathInfo().substring(1) : null;
 
     if (pathInfo.startsWith("/static/")) {
       handleStaticResource(req, resp);
@@ -29,6 +36,8 @@ public class RoomManagementServlet extends HttpServlet {
 
     if ("/room-management".equals(pathInfo)) {
       handlePageRequest(resp);
+    } else if (roomNumber != null) {
+      handleSingleRoomRequest(resp, roomNumber);
     } else {
       handleApiRequest(resp);
     }
@@ -70,7 +79,7 @@ public class RoomManagementServlet extends HttpServlet {
           resp.setContentType("application/javascript");
         }
         resp.setCharacterEncoding("UTF-8");
-
+        
         byte[] buffer = new byte[1024];
         int bytesRead;
         while ((bytesRead = inputStream.read(buffer)) != -1) {
@@ -79,6 +88,19 @@ public class RoomManagementServlet extends HttpServlet {
       } else {
         resp.sendError(HttpServletResponse.SC_NOT_FOUND);
       }
+    }
+  }
+
+  private void handleSingleRoomRequest(HttpServletResponse resp, String roomNumber) throws IOException {
+    resp.setContentType("application/json");
+    resp.setCharacterEncoding("UTF-8");
+
+    try {
+      DatabaseManager db = DatabaseManager.getInstance();
+      JSONObject room = db.getRoom(roomNumber);
+      resp.getWriter().write(room.toString());
+    } catch (SQLException e) {
+      handleError(resp, e);
     }
   }
 
@@ -97,12 +119,10 @@ public class RoomManagementServlet extends HttpServlet {
       }
 
       JSONObject jsonRequest = new JSONObject(buffer.toString());
-      System.out.println("Received data: " + jsonRequest.toString());
-
       String roomNumber = jsonRequest.getString("roomNumber");
       String roomType = jsonRequest.getString("roomType");
       String status = jsonRequest.getString("status");
-
+      
       DatabaseManager db = DatabaseManager.getInstance();
 
       if (db.roomExists(roomNumber)) {
@@ -121,12 +141,7 @@ public class RoomManagementServlet extends HttpServlet {
       resp.getWriter().write(response.toString());
 
     } catch (Exception e) {
-      System.err.println("Error in doPost: " + e.getMessage());
-      e.printStackTrace();
-      JSONObject error = new JSONObject();
-      error.put("success", false);
-      error.put("message", "오류가 발생했습니다: " + e.getMessage());
-      resp.getWriter().write(error.toString());
+      handleError(resp, e);
     }
   }
 
@@ -134,39 +149,31 @@ public class RoomManagementServlet extends HttpServlet {
   protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
     resp.setContentType("application/json");
     resp.setCharacterEncoding("UTF-8");
-
+    
     try {
-      StringBuilder buffer = new StringBuilder();
-      try (BufferedReader reader = req.getReader()) {
-        String line;
-        while ((line = reader.readLine()) != null) {
-          buffer.append(line);
+        StringBuilder buffer = new StringBuilder();
+        try (BufferedReader reader = req.getReader()) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                buffer.append(line);
+            }
         }
-      }
-
-      JSONObject jsonRequest = new JSONObject(buffer.toString());
-      String roomNumber = req.getPathInfo().substring(1); // /1234 -> 1234
-      String roomType = jsonRequest.getString("roomType");
-      String status = jsonRequest.getString("status");
-
-      DatabaseManager db = DatabaseManager.getInstance();
-      boolean success = db.updateRoom(roomNumber, roomType, status);
-
-      JSONObject response = new JSONObject();
-      response.put("success", success);
-      response.put("message", success ? "객실 정보가 업데이트되었습니다." : "객실 정보 업데이트에 실패했습니다.");
-      resp.getWriter().write(response.toString());
-
+        
+        JSONObject jsonRequest = new JSONObject(buffer.toString());
+        String roomNumber = req.getPathInfo().substring(1);
+        String roomType = jsonRequest.getString("roomType");
+        String status = jsonRequest.getString("status");
+        
+        DatabaseManager db = DatabaseManager.getInstance();
+        boolean success = db.updateRoom(roomNumber, roomType, status);
+        
+        JSONObject response = new JSONObject();
+        response.put("success", success);
+        response.put("message", success ? "객실 정보가 업데이트되었습니다." : "객실 정보 업데이트에 실패했습니다.");
+        resp.getWriter().write(response.toString());
+        
     } catch (Exception e) {
-      System.err.println("Error in doPut: " + e.getMessage());
-      e.printStackTrace();
-
-      JSONObject errorResponse = new JSONObject();
-      errorResponse.put("success", false);
-      errorResponse.put("message", "서버 오류: " + e.getMessage());
-
-      resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-      resp.getWriter().write(errorResponse.toString());
+        handleError(resp, e);
     }
   }
 
@@ -174,32 +181,32 @@ public class RoomManagementServlet extends HttpServlet {
   protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
     resp.setContentType("application/json");
     resp.setCharacterEncoding("UTF-8");
-
+    
     try {
-      String pathInfo = req.getPathInfo();
-      String roomNumber = pathInfo != null ? pathInfo.substring(1) : null;
+        String pathInfo = req.getPathInfo();
+        String roomNumber = pathInfo != null ? pathInfo.substring(1) : null;
+        
+        if (roomNumber == null || roomNumber.isEmpty()) {
+            throw new IllegalArgumentException("객실 번호가 필요합니다.");
+        }
 
-      if (roomNumber == null || roomNumber.isEmpty()) {
-        throw new IllegalArgumentException("객실 번호가 필요합니다.");
-      }
-
-      System.out.println("Deleting room: " + roomNumber);
-
-      DatabaseManager db = DatabaseManager.getInstance();
-      boolean success = db.deleteRoom(roomNumber);
-
-      JSONObject response = new JSONObject();
-      response.put("success", success);
-      response.put("message", success ? "객실이 삭제되었습니다." : "객실을 찾을 수 없습니다.");
-      resp.getWriter().write(response.toString());
-
+        System.out.println("Deleting room: " + roomNumber);
+        
+        DatabaseManager db = DatabaseManager.getInstance();
+        boolean success = db.deleteRoom(roomNumber);
+        
+        JSONObject response = new JSONObject();
+        response.put("success", success);
+        response.put("message", success ? "객실이 삭제되었습니다." : "객실을 찾을 수 없습니다.");
+        resp.getWriter().write(response.toString());
+        
     } catch (Exception e) {
-      System.err.println("Error in doDelete: " + e.getMessage());
-      e.printStackTrace();
-      JSONObject error = new JSONObject();
-      error.put("success", false);
-      error.put("message", "오류가 발생했습니다: " + e.getMessage());
-      resp.getWriter().write(error.toString());
+        System.err.println("Error in doDelete: " + e.getMessage());
+        e.printStackTrace();
+        JSONObject error = new JSONObject();
+        error.put("success", false);
+        error.put("message", "오류가 발생했습니다: " + e.getMessage());
+        resp.getWriter().write(error.toString());
     }
   }
 

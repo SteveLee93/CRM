@@ -52,7 +52,7 @@ public class DatabaseManager {
   }
 
   public JSONObject getRoom(String roomNumber) throws SQLException {
-    JSONObject room = new JSONObject();
+    JSONObject room = null; // null로 초기화
     String sql = "SELECT * FROM room WHERE room_number = ?";
 
     try (Connection conn = getConnection();
@@ -62,12 +62,16 @@ public class DatabaseManager {
       ResultSet rs = pstmt.executeQuery();
 
       if (rs.next()) {
+        room = new JSONObject();
         room.put("roomNumber", rs.getString("room_number"));
         room.put("roomType", rs.getString("room_type"));
         room.put("status", rs.getString("room_status"));
       }
+    } catch (SQLException e) {
+      LOGGER.severe("Error getting room: " + e.getMessage());
+      throw e;
     }
-    return room;
+    return room != null ? room : new JSONObject(); // 빈 객체 반환
   }
 
   public boolean addRoom(String roomNumber, String roomType, String status) throws SQLException {
@@ -94,27 +98,27 @@ public class DatabaseManager {
   }
 
   public boolean updateRoom(String roomNumber, String roomType, String status) throws SQLException {
-    String sql = "UPDATE room SET room_type = ?, status = ? WHERE room_number = ?";
+    String sql = "UPDATE room SET room_type = ?, room_status = ? WHERE room_number = ?";
 
     try (Connection conn = getConnection();
-         PreparedStatement stmt = conn.prepareStatement(sql)) {
+        PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-        System.out.println("Updating room with parameters:");
-        System.out.println("Room Number: " + roomNumber);
-        System.out.println("Room Type: " + roomType);
-        System.out.println("Status: " + status);
+      System.out.println("Updating room with parameters:");
+      System.out.println("Room Number: " + roomNumber);
+      System.out.println("Room Type: " + roomType);
+      System.out.println("Status: " + status);
 
-        stmt.setString(1, roomType);
-        stmt.setString(2, status);
-        stmt.setString(3, roomNumber);
+      stmt.setString(1, roomType);
+      stmt.setString(2, status);
+      stmt.setString(3, roomNumber);
 
-        int rowsAffected = stmt.executeUpdate();
-        System.out.println("Rows affected: " + rowsAffected);
-        return rowsAffected > 0;
+      int rowsAffected = stmt.executeUpdate();
+      System.out.println("Rows affected: " + rowsAffected);
+      return rowsAffected > 0;
     } catch (SQLException e) {
-        System.err.println("SQL Error: " + e.getMessage());
-        e.printStackTrace();
-        throw e;
+      System.err.println("SQL Error: " + e.getMessage());
+      e.printStackTrace();
+      throw e;
     }
   }
 
@@ -357,8 +361,6 @@ public class DatabaseManager {
       throw e;
     }
   }
-  
-
 
   // 예약 관련 메서드 추가
   public JSONArray getReservations() throws SQLException {
@@ -366,20 +368,20 @@ public class DatabaseManager {
     String sql = "SELECT * FROM reservation ORDER BY reservation_dt DESC";
 
     try (Connection conn = getConnection();
-         PreparedStatement stmt = conn.prepareStatement(sql)) {
-        
-        ResultSet rs = stmt.executeQuery();
-        while (rs.next()) {
-            JSONObject reservation = new JSONObject();
-            reservation.put("id", rs.getInt("id"));
-            reservation.put("name", rs.getString("name"));
-            reservation.put("roomNumber", rs.getString("room_number"));
-            reservation.put("roomType", rs.getString("room_type"));
-            reservation.put("checkInDt", rs.getDate("checkin_dt").toString());
-            reservation.put("checkOutDt", rs.getDate("checkout_dt").toString());
-            reservation.put("reservationDt", rs.getTimestamp("reservation_dt").toString());
-            reservations.put(reservation);
-        }
+        PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+      ResultSet rs = stmt.executeQuery();
+      while (rs.next()) {
+        JSONObject reservation = new JSONObject();
+        reservation.put("id", rs.getInt("id"));
+        reservation.put("name", rs.getString("name"));
+        reservation.put("roomNumber", rs.getString("room_number"));
+        reservation.put("roomType", rs.getString("room_type"));
+        reservation.put("checkInDt", rs.getDate("checkin_dt").toString());
+        reservation.put("checkOutDt", rs.getDate("checkout_dt").toString());
+        reservation.put("reservationDt", rs.getTimestamp("reservation_dt").toString());
+        reservations.put(reservation);
+      }
     }
     return reservations;
   }
