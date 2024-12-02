@@ -17,6 +17,7 @@ import com.customer.servlets.CheckUsernameServlet;
 import com.customer.servlets.CustomerManagementServlet;
 import com.customer.servlets.CustomerReservationServlet;
 import com.customer.servlets.ReservationStatusPage.ReservationStatusServlet;
+import com.customer.servlets.ReservationStatisticsPage.ReservationStatisticsServlet;
 import java.io.File;
 
 public class Main {
@@ -96,6 +97,11 @@ public class Main {
 		// RoomOccupiedServlet 추가
 		Tomcat.addServlet(ctx, "roomOccupiedServlet", new RoomOccupiedServlet());
 		ctx.addServletMappingDecoded("/api/room/occupied", "roomOccupiedServlet");
+
+		// ReservationStatisticsServlet 추가
+		Tomcat.addServlet(ctx, "reservationStatisticsServlet", new ReservationStatisticsServlet());
+		ctx.addServletMappingDecoded("/reservationStatistics", "reservationStatisticsServlet");
+		ctx.addServletMappingDecoded("/api/statistics", "reservationStatisticsServlet");
 
 		try {
 			tomcat.start();

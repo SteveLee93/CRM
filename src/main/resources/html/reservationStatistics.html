@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>예약 통계</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="/static/css/reservationStatistics.css" rel="stylesheet">
+</head>
+
+<body>
+    <div id="sidebarContainer"></div>
+
+    <div class="page-wrapper">
+        <div class="main-content">
+            <div class="container-fluid">
+                <!-- 통계 카드 -->
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="stats-card">
+                            <div class="stats-number" id="totalReservations">0</div>
+                            <div class="stats-label">총 예약 수</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stats-card">
+                            <div class="stats-number" id="avgStayDuration">0</div>
+                            <div class="stats-label">평균 숙박 기간 (일)</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stats-card">
+                            <div class="stats-number" id="popularRoomType">-</div>
+                            <div class="stats-label">인기 객실 타입</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 차트 섹션 -->
+                <div class="row">
+                    <!-- 월별 예약 추이 -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">월별 예약 추이</h5>
+                                <canvas id="monthlyReservationsChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 객실 타입별 예약 분포 -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">객실 타입별 예약 분포</h5>
+                                <canvas id="roomTypeDistributionChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 요일별 체크인/체크아웃 패턴 -->
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">요일별 체크인/체크아웃 패턴</h5>
+                                <canvas id="weekdayPatternChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 예약 기간 분포 -->
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">예약 기간 분포</h5>
+                                <canvas id="stayDurationChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/reservationStatistics.js"></script>
+</body>
+
+</html>
