@@ -101,22 +101,22 @@ public class DatabaseManager {
     String sql = "UPDATE room SET room_type = ? WHERE room_number = ?";
 
     try (Connection conn = getConnection();
-         PreparedStatement stmt = conn.prepareStatement(sql)) {
+        PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-        System.out.println("Updating room with parameters:");
-        System.out.println("Room Number: " + roomNumber);
-        System.out.println("Room Type: " + roomType);
+      System.out.println("Updating room with parameters:");
+      System.out.println("Room Number: " + roomNumber);
+      System.out.println("Room Type: " + roomType);
 
-        stmt.setString(1, roomType);
-        stmt.setString(2, roomNumber);
+      stmt.setString(1, roomType);
+      stmt.setString(2, roomNumber);
 
-        int rowsAffected = stmt.executeUpdate();
-        System.out.println("Rows affected: " + rowsAffected);
-        return rowsAffected > 0;
+      int rowsAffected = stmt.executeUpdate();
+      System.out.println("Rows affected: " + rowsAffected);
+      return rowsAffected > 0;
     } catch (SQLException e) {
-        System.err.println("SQL Error: " + e.getMessage());
-        e.printStackTrace();
-        throw e;
+      System.err.println("SQL Error: " + e.getMessage());
+      e.printStackTrace();
+      throw e;
     }
   }
 
@@ -363,28 +363,28 @@ public class DatabaseManager {
   public JSONArray getRoomReservations(String roomNumber) throws SQLException {
     JSONArray reservations = new JSONArray();
     String sql = "SELECT * FROM reservation WHERE room_number = ?";
-    
+
     System.out.println("Executing query for room: " + roomNumber); // 디버깅용
-    
+
     try (Connection conn = getConnection();
-         PreparedStatement pstmt = conn.prepareStatement(sql)) {
-        
-        pstmt.setString(1, roomNumber);
-        
-        try (ResultSet rs = pstmt.executeQuery()) {
-            while (rs.next()) {
-                JSONObject reservation = new JSONObject();
-                reservation.put("id", rs.getInt("id"));
-                reservation.put("name", rs.getString("name"));
-                reservation.put("roomNumber", rs.getString("room_number"));
-                reservation.put("roomType", rs.getString("room_type"));
-                reservation.put("checkinDt", rs.getString("checkin_dt"));
-                reservation.put("checkoutDt", rs.getString("checkout_dt"));
-                reservations.put(reservation);
-                
-                System.out.println("Found reservation: " + reservation.toString()); // 디버깅용
-            }
+        PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+      pstmt.setString(1, roomNumber);
+
+      try (ResultSet rs = pstmt.executeQuery()) {
+        while (rs.next()) {
+          JSONObject reservation = new JSONObject();
+          reservation.put("id", rs.getInt("id"));
+          reservation.put("name", rs.getString("name"));
+          reservation.put("roomNumber", rs.getString("room_number"));
+          reservation.put("roomType", rs.getString("room_type"));
+          reservation.put("checkinDt", rs.getString("checkin_dt"));
+          reservation.put("checkoutDt", rs.getString("checkout_dt"));
+          reservations.put(reservation);
+
+          System.out.println("Found reservation: " + reservation.toString()); // 디버깅용
         }
+      }
     }
     return reservations;
   }
@@ -392,26 +392,49 @@ public class DatabaseManager {
   public JSONArray getAllReservations() throws SQLException {
     JSONArray reservations = new JSONArray();
     String sql = "SELECT * FROM reservation ORDER BY checkin_dt";
-    
+
     System.out.println("Executing query for all reservations"); // 디버깅용
-    
+
     try (Connection conn = getConnection();
-         Statement stmt = conn.createStatement();
-         ResultSet rs = stmt.executeQuery(sql)) {
-        
-        while (rs.next()) {
-            JSONObject reservation = new JSONObject();
-            reservation.put("id", rs.getInt("id"));
-            reservation.put("name", rs.getString("name"));
-            reservation.put("roomNumber", rs.getString("room_number"));
-            reservation.put("roomType", rs.getString("room_type"));
-            reservation.put("checkinDt", rs.getString("checkin_dt"));
-            reservation.put("checkoutDt", rs.getString("checkout_dt"));
-            reservations.put(reservation);
-        }
+        Statement stmt = conn.createStatement();
+        ResultSet rs = stmt.executeQuery(sql)) {
+
+      while (rs.next()) {
+        JSONObject reservation = new JSONObject();
+        reservation.put("id", rs.getInt("id"));
+        reservation.put("name", rs.getString("name"));
+        reservation.put("roomNumber", rs.getString("room_number"));
+        reservation.put("roomType", rs.getString("room_type"));
+        reservation.put("checkinDt", rs.getString("checkin_dt"));
+        reservation.put("checkoutDt", rs.getString("checkout_dt"));
+        reservations.put(reservation);
+      }
     }
-    
+
     System.out.println("Total reservations found: " + reservations.length()); // 디버깅용
+    return reservations;
+  }
+
+  public JSONArray getReservations() throws SQLException {
+    JSONArray reservations = new JSONArray();
+    String sql = "SELECT * FROM reservation ORDER BY checkin_dt";
+
+    try (Connection conn = getConnection();
+        Statement stmt = conn.createStatement();
+        ResultSet rs = stmt.executeQuery(sql)) {
+
+      while (rs.next()) {
+        JSONObject reservation = new JSONObject();
+        reservation.put("id", rs.getInt("id"));
+        reservation.put("name", rs.getString("name"));
+        reservation.put("roomNumber", rs.getString("room_number"));
+        reservation.put("roomType", rs.getString("room_type"));
+        reservation.put("checkInDt", rs.getDate("checkin_dt"));
+        reservation.put("checkOutDt", rs.getDate("checkout_dt"));
+        reservation.put("reservationDt", rs.getTimestamp("reservation_dt"));
+        reservations.put(reservation);
+      }
+    }
     return reservations;
   }
 }
