@@ -10,7 +10,7 @@
   <style>
     /* 기본 레이아웃 */
     body {
-      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      background: linear-gradient(135deg, #4A3B38 0%, #6B5B57 100%);
       min-height: 100vh;
       display: flex;
       align-items: center;
@@ -41,7 +41,7 @@
       display: grid;
       place-items: center;
       gap: 10px;
-      background: linear-gradient(to right, #1e3c72, #2a5298);
+      background: linear-gradient(to right, #4A3B38, #6B5B57);
       padding: 30px;
       color: white;
     }
@@ -75,8 +75,8 @@
     }
 
     .form-control:focus {
-      border-color: #1e3c72;
-      box-shadow: 0 0 0 0.2rem rgba(30, 60, 114, 0.25);
+      border-color: #4A3B38;
+      box-shadow: 0 0 0 0.2rem rgba(74, 59, 56, 0.25);
     }
 
     /* 입력 그룹 스타일 */
@@ -108,7 +108,7 @@
     .check-btn {
       width: 120px;
       border: none;
-      background: linear-gradient(45deg, #1e3c72, #2a5298);
+      background: linear-gradient(45deg, #4A3B38, #6B5B57);
       color: white;
       display: flex;
       align-items: center;
@@ -117,15 +117,15 @@
     }
 
     .check-btn:hover {
-      background: linear-gradient(45deg, #2a5298, #1e3c72);
+      background: linear-gradient(45deg, #6B5B57, #4A3B38);
     }
 
     .check-btn.available {
-      background: linear-gradient(45deg, #198754, #28a745);
+      background: linear-gradient(45deg, #5D4A47, #7C6B67);
     }
 
     .check-btn.unavailable {
-      background: linear-gradient(45deg, #dc3545, #c82333);
+      background: linear-gradient(45deg, #8B6B66, #725652);
     }
 
     /* 메시지 스타일 */
@@ -145,11 +145,11 @@
     }
 
     .validation-message.available {
-      color: #198754;
+      color: #5D4A47;
     }
 
     .validation-message.unavailable {
-      color: #dc3545;
+      color: #8B6B66;
     }
 
     /* 비밀번호 강도 표시 */
@@ -163,15 +163,15 @@
     }
 
     .strength.weak {
-      color: #dc3545;
+      color: #8B6B66;
     }
 
     .strength.medium {
-      color: #ffc107;
+      color: #6B5B57;
     }
 
     .strength.strong {
-      color: #198754;
+      color: #4A3B38;
     }
 
     /* 도움말 텍스트 */
@@ -240,6 +240,85 @@
       margin: 2rem 0;
       /* 위아래 여백 */
       opacity: 0.7;
+    }
+
+    /* 버튼 스타일 */
+    .btn-primary {
+      background: linear-gradient(45deg, #4A3B38, #6B5B57);
+      border: none;
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(45deg, #6B5B57, #4A3B38);
+    }
+
+    .btn-outline-secondary {
+      border-color: #4A3B38;
+      color: #4A3B38;
+    }
+
+    .btn-outline-secondary:hover {
+      background-color: #4A3B38;
+      border-color: #4A3B38;
+      color: white;
+    }
+
+    /* 가입하기 버튼 스타일 */
+    .btn-signup {
+      background: linear-gradient(45deg, #4A3B38, #6B5B57);
+      color: white;
+      padding: 12px 30px;
+      border: none;
+      border-radius: 50px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn-signup:hover {
+      background: linear-gradient(45deg, #6B5B57, #4A3B38);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(74, 59, 56, 0.4);
+    }
+
+    .btn-signup:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 8px rgba(74, 59, 56, 0.3);
+    }
+
+    .btn-signup::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(120deg,
+          transparent,
+          rgba(255, 255, 255, 0.2),
+          transparent);
+      transition: 0.5s;
+    }
+
+    .btn-signup:hover::before {
+      left: 100%;
+    }
+
+    .btn-signup i {
+      font-size: 1.2em;
+      transition: transform 0.3s ease;
+    }
+
+    .btn-signup:hover i {
+      transform: translateX(3px);
     }
   </style>
 </head>
@@ -320,7 +399,7 @@
 
           <!-- 버튼 그룹 -->
           <div class="d-flex justify-content-between">
-            <button type="submit" class="btn btn-success">
+            <button type="submit" class="btn btn-success btn-signup">
               <i class="fas fa-user-plus me-2"></i>가입하기
             </button>
             <button type="button" id="cancelButton" class="btn btn-outline-secondary">
@@ -385,7 +464,7 @@
 
           const data = await response.json();
 
-          if (data.exists) {
+          if (!data.available) {
             usernameMessage.innerHTML = '<i class="fas fa-times-circle"></i>이미 사용 중인 아이디입니다.';
             usernameMessage.className = 'validation-message unavailable';
             checkUsernameBtn.className = 'btn check-btn unavailable';
@@ -451,7 +530,7 @@
 
           const data = await response.json();
 
-          if (data.exists) {
+          if (!data.available) {
             emailMessage.innerHTML = '<i class="fas fa-times-circle"></i>이미 사용 중인 이메일입니다.';
             emailMessage.className = 'validation-message unavailable';
             checkEmailBtn.className = 'btn check-btn unavailable';
