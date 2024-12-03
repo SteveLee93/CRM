@@ -15,7 +15,7 @@ import org.json.JSONArray;
 import com.customer.database.DatabaseManager;
 import jakarta.servlet.http.HttpSession;
 
-@WebServlet(urlPatterns = { "/dashboard", "/api/room", "/static/*" })
+@WebServlet(urlPatterns = { "/dashboard", "/api/room", "/api/reservation/room/*", "/api/reservation/all", "/static/*" })
 public class DashboardServlet extends HttpServlet {
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -27,18 +27,20 @@ public class DashboardServlet extends HttpServlet {
     }
 
     String pathInfo = req.getServletPath();
+    System.out.println("Requested path: " + pathInfo); // URL 패턴 확인용
 
-    // static 리소스 요청 처리
     if (pathInfo.startsWith("/static/")) {
       handleStaticResource(req, resp);
-      return;
-    }
-
-    // URL 패턴에 따라 다른 처리
-    if ("/dashboard".equals(pathInfo)) {
+    } else if ("/dashboard".equals(pathInfo)) {
       handlePageRequest(resp);
     } else if ("/api/room".equals(pathInfo)) {
       handleApiRequest(resp);
+    } else if (pathInfo.startsWith("/api/reservation/room")) {
+      handleRoomReservations(req, resp);
+    } else if ("/api/reservation/all".equals(pathInfo)) {
+      handleAllReservations(resp);
+    }else {
+      resp.sendError(HttpServletResponse.SC_NOT_FOUND);
     }
   }
 
@@ -97,7 +99,7 @@ public class DashboardServlet extends HttpServlet {
           resp.setContentType("application/javascript");
         }
         resp.setCharacterEncoding("UTF-8");
-
+        
         // 파일 내용 전송
         byte[] buffer = new byte[1024];
         int bytesRead;
@@ -107,6 +109,36 @@ public class DashboardServlet extends HttpServlet {
       } else {
         resp.sendError(HttpServletResponse.SC_NOT_FOUND);
       }
+    }
+  }
+
+  // 객실별 예약 조회 처리
+  private void handleRoomReservations(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    // URL 패턴에서 roomNumber 추출 방식 수정
+    String pathInfo = req.getPathInfo();  // /123 형태로 반환
+    String roomNumber = pathInfo.substring(1);  // 앞의 / 제거
+    
+    DatabaseManager db = DatabaseManager.getInstance();
+
+    try {
+        JSONArray reservations = db.getRoomReservations(roomNumber);
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
+        resp.getWriter().write(reservations.toString());
+    } catch (SQLException e) {
+        handleError(resp, e);
+    }
+  }
+
+  private void handleAllReservations(HttpServletResponse resp) throws IOException {
+    DatabaseManager db = DatabaseManager.getInstance();
+    try {
+      JSONArray reservations = db.getAllReservations();
+      resp.setContentType("application/json");
+      resp.setCharacterEncoding("UTF-8");
+      resp.getWriter().write(reservations.toString());
+    } catch (SQLException e) {
+      handleError(resp, e);
     }
   }
 }

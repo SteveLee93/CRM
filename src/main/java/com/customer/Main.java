@@ -51,7 +51,9 @@ public class Main {
 
 		Tomcat.addServlet(ctx, "dashboardServlet", new DashboardServlet());
 		ctx.addServletMappingDecoded("/dashboard", "dashboardServlet");
-		ctx.addServletMappingDecoded("/api/dashboard", "dashboardServlet");
+		ctx.addServletMappingDecoded("/api/room", "dashboardServlet");
+		ctx.addServletMappingDecoded("/api/reservation/all", "dashboardServlet");
+		ctx.addServletMappingDecoded("/api/reservation/room/*", "dashboardServlet");
 
 		Tomcat.addServlet(ctx, "roomManagementServlet", new RoomManagementServlet());
 		ctx.addServletMappingDecoded("/room-management", "roomManagementServlet");

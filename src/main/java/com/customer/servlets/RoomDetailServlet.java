@@ -14,9 +14,9 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.List;
 
-@WebServlet(urlPatterns = {
-        "/room-detail",
-        "/static/*" // static 리소스 처리를 위한 패턴 추가
+@WebServlet(urlPatterns = { 
+    "/room-detail", 
+    "/static/*"  // static 리소스 처리를 위한 패턴 추가
 })
 public class RoomDetailServlet extends HttpServlet {
     private static final String DB_URL = "jdbc:mysql://localhost:3306/crm";
@@ -49,7 +49,7 @@ public class RoomDetailServlet extends HttpServlet {
                     resp.setContentType("application/javascript");
                 }
                 resp.setCharacterEncoding("UTF-8");
-
+                
                 // 파일 내용 전송
                 byte[] buffer = new byte[1024];
                 int bytesRead;
@@ -70,8 +70,8 @@ public class RoomDetailServlet extends HttpServlet {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-                    Statement stmt = conn.createStatement();
-                    ResultSet rs = stmt.executeQuery("SELECT * FROM room")) {
+                 Statement stmt = conn.createStatement();
+                 ResultSet rs = stmt.executeQuery("SELECT * FROM room")) {
 
                 String filePath = getServletContext().getRealPath("/html/room-detail.html");
                 List<String> lines = Files.readAllLines(Paths.get(filePath));
@@ -113,15 +113,11 @@ public class RoomDetailServlet extends HttpServlet {
     }
 
     private String getStatusClass(String status) {
-        switch (status.toLowerCase()) {
-            case "이용가능":
-                return "status-available";
-            case "사용중":
-                return "status-occupied";
-            case "청소중":
-                return "status-cleaning";
-            default:
-                return "";
+        switch(status.toLowerCase()) {
+            case "이용가능": return "status-available";
+            case "사용중": return "status-occupied";
+            case "청소중": return "status-cleaning";
+            default: return "";
         }
     }
 }

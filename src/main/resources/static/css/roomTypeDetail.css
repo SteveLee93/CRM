@@ -1,0 +1,103 @@
+.detail-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1050;
+}
+
+.detail-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 800px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.room-details-container {
+    position: relative;
+    background: white;
+    max-width: 600px;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+    border: 1px solid #e0e0e0;
+}
+
+#roomImageCarousel {
+    width: 100%;
+    max-height: 70vh;
+    margin: 0 auto;
+}
+
+.carousel-inner {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.carousel-item {
+    height: 40vh;
+}
+
+.carousel-item img {
+    width: 70%;
+    height: 70%;
+    object-fit: cover;
+    margin: 0 auto;
+    display: block;
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+    width: 10%;
+    opacity: 1;
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+.carousel-control-prev:hover,
+.carousel-control-next:hover {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.5));
+}
+
+.carousel-indicators {
+    margin-bottom: 0;
+}
+
+.button-group {
+    margin-top: 20px;
+    text-align: right;
+}
+
+.room-type-title {
+    color: #1e3c72;
+    font-weight: 600;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #1e3c72;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .detail-content {
+        width: 95%;
+        padding: 15px;
+    }
+
+    .carousel-item {
+        height: 40vh;
+    }
+}

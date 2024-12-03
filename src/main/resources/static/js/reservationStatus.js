@@ -210,7 +210,7 @@ function initializeEventListeners() {
             // 활성화된 카드 스타일 변경
             statsCards.forEach(c => c.classList.remove('active'));
             card.classList.add('active');
-            
+
             // 상태에 따른 필터링
             const status = card.dataset.status;
             filterReservations(status);
