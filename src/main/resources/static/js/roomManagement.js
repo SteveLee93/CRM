@@ -1,6 +1,7 @@
 let modal;
     let currentMode = 'add';
     let allRooms = [];
+    let currentRoomNumber = null;
 
     function loadSidebar() {
       fetch('/html/components/sidebar.html')
@@ -267,7 +268,7 @@ let modal;
         })
         .catch(error => {
           console.error('Error:', error);
-          alert('객실 목록을 불러오는데 실패했습니다.');
+          alert('객실 목록을 불러오는데 실패했니다.');
         });
     }
 
@@ -289,7 +290,6 @@ let modal;
     </tr>
   `).join('');
 
-      // showCount가 true일 때만 검색 결과 카운트 표시
       if (showCount) {
         const resultCount = rooms.length;
         const infoDiv = document.createElement('div');
@@ -393,26 +393,120 @@ let modal;
       }
     }
 
-    // 객실 상세 정보 모달을 보여주는 함수 추가
     function showRoomDetail(roomNumber) {
-      fetch(`/api/room/${roomNumber}`)
+        currentRoomNumber = roomNumber;
+        fetch(`/api/room/${roomNumber}`)
+            .then(response => response.json())
+            .then(room => {
+                loadRoomImages(roomNumber);
+                const detailModal = new bootstrap.Modal(document.getElementById('roomDetailModal'), {
+                    keyboard: true,
+                    focus: true
+                });
+                
+                const modalElement = document.getElementById('roomDetailModal');
+                modalElement.addEventListener('hidden.bs.modal', function () {
+                    // 모달이 닫힐 때 aria-hidden 속성 제거
+                    modalElement.removeAttribute('aria-hidden');
+                    // 포커스를 적절한 요소로 이동
+                    document.querySelector('.room-table').focus();
+                });
+                
+                detailModal.show();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('객실 정보를 불러오는데 실패했습니다.');
+            });
+    }
+
+    function loadRoomImages(roomNumber) {
+        fetch(`/api/room/${roomNumber}/images`)
+            .then(response => response.json())
+            .then(data => {
+                const container = document.getElementById('roomImagesContainer');
+                
+                if (!data || !Array.isArray(data) || data.length === 0) {
+                    container.innerHTML = '<div class="col-12 text-center" role="alert">등록된 이미지가 없습니다.</div>';
+                    return;
+                }
+
+                container.innerHTML = data.map((image, index) => `
+                    <div class="col-md-4 mb-3">
+                        <div class="card">
+                            <img src="/uploads/room_images/${image.imagePath}" 
+                                 class="card-img-top" 
+                                 alt="객실 이미지 ${index + 1}"
+                                 style="height: 200px; object-fit: cover;">
+                            <div class="card-body">
+                                <button class="btn btn-danger btn-sm" 
+                                        onclick="deleteImage(${image.id})"
+                                        aria-label="이미지 삭제">
+                                    <i class="fas fa-trash" aria-hidden="true"></i> 삭제
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                const container = document.getElementById('roomImagesContainer');
+                container.innerHTML = '<div class="col-12 text-center text-danger" role="alert">이미지를 불러오는데 실패했습니다.</div>';
+            });
+    }
+
+    function uploadImage() {
+      const formData = new FormData();
+      const fileInput = document.getElementById('roomImage');
+      
+      if (!fileInput.files[0]) {
+        alert('파일을 선택해주세요.');
+        return;
+      }
+
+      formData.append('image', fileInput.files[0]);
+      formData.append('roomNumber', currentRoomNumber);
+
+      fetch('/api/room/image', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(result => {
+        if (result.success) {
+          alert('이미지가 업로드되었습니다.');
+          loadRoomImages(currentRoomNumber);
+          fileInput.value = ''; // 파일 입력 초기화
+        } else {
+          alert(result.message || '이미지 업로드에 실패했습니다.');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('이미지 업로드 중 오류가 발생했습니다.');
+      });
+    }
+
+    function deleteImage(imageId) {
+      if (confirm('이 이미지를 삭제하시겠습니까?')) {
+        fetch(`/api/room/image/${imageId}`, {
+          method: 'DELETE'
+        })
         .then(response => response.json())
-        .then(room => {
-          document.getElementById('detailRoomNumber').textContent = room.roomNumber;
-          document.getElementById('detailRoomType').textContent = room.roomType;
-          document.getElementById('detailStatus').textContent = getStatusText(room.status);
-          
-          // 객실 타입에 따른 이미지 설정
-          const imageUrl = `/static/images/${room.roomType.toLowerCase()}.jpg`;
-          document.getElementById('roomImage').src = imageUrl;
-          
-          const detailModal = new bootstrap.Modal(document.getElementById('roomDetailModal'));
-          detailModal.show();
+        .then(result => {
+          if (result.success) {
+            alert('이미지가 삭제되었습니다.');
+            loadRoomImages(currentRoomNumber);
+          } else {
+            alert(result.message || '이미지 삭제에 실패했습니다.');
+          }
         })
         .catch(error => {
           console.error('Error:', error);
-          alert('객실 정보를 불러오는데 실패했습니다.');
+          alert('이미지 삭제 중 오류가 발생했습니다.');
         });
+      }
     }
 
     document.addEventListener('DOMContentLoaded', function () {

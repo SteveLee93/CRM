@@ -69,6 +69,28 @@
       background-color: #f8f9fa;
       border-top: 1px solid #dee2e6;
     }
+
+    .carousel-inner img {
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon {
+      padding: 20px;
+    }
+
+    .carousel-indicators {
+      bottom: -50px;
+    }
+
+    .carousel-indicators button {
+      background-color: #666;
+    }
+
+    .carousel-indicators .active {
+      background-color: #000;
+    }
   </style>
 </head>
 
@@ -232,37 +254,29 @@
     </div>
   </div>
 
-  <!-- 객실 상세 정보 모달 -->
-  <div class="modal fade" id="roomDetailModal" tabindex="-1">
+  <!-- 객실 상세 정보 모달 (이미지 갤러리) -->
+  <div class="modal fade" id="roomDetailModal" tabindex="-1" aria-labelledby="roomDetailModalLabel" aria-hidden="false">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">객실 상세 정보</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          <h5 class="modal-title" id="roomDetailModalLabel">객실 갤러리</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body">
-          <div class="room-details-container">
-            <div class="room-image mb-4">
-              <img id="roomImage" alt="객실 이미지" class="img-fluid rounded shadow">
-            </div>
-            <div class="room-details">
-              <div class="info-item mb-3">
-                <strong class="info-label">객실 번호:</strong>
-                <span id="detailRoomNumber" class="info-value"></span>
-              </div>
-              <div class="info-item mb-3">
-                <strong class="info-label">객실 유형:</strong>
-                <span id="detailRoomType" class="info-value"></span>
-              </div>
-              <div class="info-item mb-3">
-                <strong class="info-label">객실 상태:</strong>
-                <span id="detailStatus" class="info-value"></span>
-              </div>
-            </div>
+        <div class="modal-body" id="roomDetailModalBody">
+          <!-- 이미지 업로드 폼 추가 -->
+          <div class="mb-3">
+            <form id="imageUploadForm" enctype="multipart/form-data">
+              <input type="file" class="form-control" id="roomImage" name="image" accept="image/*" aria-label="이미지 선택">
+              <button type="button" class="btn btn-primary mt-2" onclick="uploadImage()" aria-label="이미지 업로드">이미지 업로드</button>
+            </form>
+          </div>
+          <!-- 이미지 갤러리 컨테이너 -->
+          <div id="roomImagesContainer" class="row" role="region" aria-label="이미지 갤러리">
+            <!-- 이미지들이 여기에 동적으로 추가됨 -->
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="닫기">닫기</button>
         </div>
       </div>
     </div>

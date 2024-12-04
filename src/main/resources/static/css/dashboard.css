@@ -5,7 +5,6 @@ body {
 
 .page-wrapper {
   height: 100vh;
-  margin-left: 260px;
   overflow: hidden;
 }
 
@@ -37,7 +36,7 @@ body {
   margin: 10px;
   border-radius: 8px;
   background-color: white;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: all 0.2s ease;
   cursor: pointer;
   border: 1px solid #dee2e6;
@@ -45,7 +44,7 @@ body {
 
 .room:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .room.available {
@@ -75,7 +74,7 @@ body {
   padding: 15px;
   background-color: white;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .stats-number {
@@ -201,7 +200,6 @@ body {
 }
 
 .page-wrapper {
-  margin-left: 260px;
   min-height: 100vh;
   transition: margin-left 0.3s;
 }
@@ -304,7 +302,7 @@ body {
   padding: 20px;
   background-color: white;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .fc-event {
@@ -354,87 +352,88 @@ body {
     margin: 5px;
     padding: 10px;
   }
-  
+
   .room-number {
     font-size: 1rem;
   }
-  
+
   .room-type {
     font-size: 0.8rem;
   }
-  
+
   #calendar {
     padding: 10px;
   }
 }
 
 .room-type-section {
-    display: flex;
-    background-color: #f8f9fa;
-    margin: 0;
-    padding: 15px 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    width: 100%;
+  display: flex;
+  background-color: #f8f9fa;
+  margin: 0;
+  padding: 15px 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  width: 100%;
 }
 
 .gallery-title {
-    color: #495057;
-    font-weight: 600;
-    margin-right: 20px;
-    white-space: nowrap;
-    flex-shrink: 0;
+  color: #495057;
+  font-weight: 600;
+  margin-right: 20px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .room-type-section .d-flex {
-    flex: 1;
-    justify-content: space-between;
+  flex: 1;
+  justify-content: space-between;
 }
 
 .room-type-section .btn-outline-primary {
-    flex: 1;
-    margin: 0 5px;
-    text-align: center;
+  flex: 1;
+  margin: 0 5px;
+  text-align: center;
 }
 
 .room-type-section .btn-outline-primary:first-child {
-    margin-left: 0;
+  margin-left: 0;
 }
 
 .room-type-section .btn-outline-primary:last-child {
-    margin-right: 0;
+  margin-right: 0;
 }
 
 @media (max-width: 992px) {
-    .room-type-section {
-        flex-direction: column;
-        align-items: flex-start;
-    }
+  .room-type-section {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 
-    .gallery-title {
-        margin-bottom: 10px;
-    }
+  .gallery-title {
+    margin-bottom: 10px;
+  }
 
-    .room-type-section .d-flex {
-        width: 100%;
-        justify-content: space-between;
-    }
+  .room-type-section .d-flex {
+    width: 100%;
+    justify-content: space-between;
+  }
 }
 
 @media (max-width: 768px) {
-    .room-type-section .d-flex {
-        flex-wrap: wrap;
-        gap: 5px;
-    }
+  .room-type-section .d-flex {
+    flex-wrap: wrap;
+    gap: 5px;
+  }
 
-    .room-type-section .btn-outline-primary {
-        flex: 1;
-        min-width: calc(50% - 5px);
-    }
+  .room-type-section .btn-outline-primary {
+    flex: 1;
+    min-width: calc(50% - 5px);
+  }
 }
 
-.carousel-control-prev, .carousel-control-next {
-  width: 40px; 
+.carousel-control-prev,
+.carousel-control-next {
+  width: 40px;
   height: 40px;
   position: absolute;
   top: 50%;
@@ -451,81 +450,81 @@ body {
 
 .carousel-control-prev-icon,
 .carousel-control-next-icon {
-    width: 40px;
-    height: 40px;
+  width: 40px;
+  height: 40px;
 }
 
 /* 캘린더 요일, 날짜 스타일 */
 .fc-col-header-cell-cushion,
 .fc-daygrid-day-number {
-    text-decoration: none !important;
-    color: #495057;
+  text-decoration: none !important;
+  color: #495057;
 }
 
 .fc-col-header-cell-cushion:hover,
 .fc-daygrid-day-number:hover {
-    text-decoration: none !important;
-    color: #495057;
+  text-decoration: none !important;
+  color: #495057;
 }
 
 .gallery-section {
-    margin-bottom: 20px;
+  margin-bottom: 20px;
 }
 
 .dashboard-layout {
-    display: flex;
-    gap: 20px;
-    height: calc(100vh - 140px);
+  display: flex;
+  gap: 20px;
+  height: calc(100vh - 140px);
 }
 
 .rooms-section {
-    width: 40%;
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
+  width: 40%;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .rooms-container {
-    height: 800px;
-    padding-right: 10px;
+  height: 800px;
+  padding-right: 10px;
 }
 
 .calendar-section {
-    width: 60%;
-    flex-shrink: 0;
-    overflow-y: auto;
-    padding-bottom: 20px;
+  width: 60%;
+  flex-shrink: 0;
+  overflow-y: auto;
+  padding-bottom: 20px;
 }
 
 #calendar {
-    height: calc(100% - 30px);
-    background-color: white;
-    margin-top: 0;
-    padding: 15px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  height: calc(100% - 30px);
+  background-color: white;
+  margin-top: 0;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .rooms-container::-webkit-scrollbar,
 .calendar-section::-webkit-scrollbar {
-    width: 8px;
+  width: 8px;
 }
 
 .rooms-container::-webkit-scrollbar-track,
 .calendar-section::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 4px;
+  background: #f1f1f1;
+  border-radius: 4px;
 }
 
 .rooms-container::-webkit-scrollbar-thumb,
 .calendar-section::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 4px;
+  background: #888;
+  border-radius: 4px;
 }
 
 .rooms-container::-webkit-scrollbar-thumb:hover,
 .calendar-section::-webkit-scrollbar-thumb:hover {
-    background: #555;
+  background: #555;
 }
 
 .fc .fc-toolbar.fc-header-toolbar {
@@ -534,52 +533,52 @@ body {
 
 /* 반응형 디자인 */
 @media (max-width: 1200px) {
-    .rooms-section {
-        width: 45%;
-    }
-    
-    .calendar-section {
-        width: 55%;
-    }
+  .rooms-section {
+    width: 45%;
+  }
+
+  .calendar-section {
+    width: 55%;
+  }
 }
 
 @media (max-width: 992px) {
-    .dashboard-layout {
-        flex-direction: column;
-        height: auto;
-        gap: 30px;
-    }
+  .dashboard-layout {
+    flex-direction: column;
+    height: auto;
+    gap: 30px;
+  }
 
-    .rooms-section,
-    .calendar-section {
-        width: 100%;
-        height: auto;
-    }
+  .rooms-section,
+  .calendar-section {
+    width: 100%;
+    height: auto;
+  }
 
-    .rooms-section {
-        max-height: 600px;
-    }
+  .rooms-section {
+    max-height: 600px;
+  }
 
-    .calendar-section {
-        height: 600px;
-    }
+  .calendar-section {
+    height: 600px;
+  }
 
-    .rooms-container {
-        max-height: 450px;
-        overflow-y: auto;
-    }
+  .rooms-container {
+    max-height: 450px;
+    overflow-y: auto;
+  }
 }
 
 @media (max-width: 768px) {
-    .dashboard-layout {
-        gap: 20px;
-    }
+  .dashboard-layout {
+    gap: 20px;
+  }
 
-    .rooms-section {
-        max-height: 500px;
-    }
+  .rooms-section {
+    max-height: 500px;
+  }
 
-    .calendar-section {
-        height: 500px;
-    }
+  .calendar-section {
+    height: 500px;
+  }
 }

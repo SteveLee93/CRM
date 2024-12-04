@@ -169,122 +169,6 @@ function getStatusBadgeClass(status) {
   }
 }
 
-function showRoomDetails(roomType) {
-  console.log(`Showing room details for ${roomType} type`);
-
-  const container = document.getElementById('roomDetailContainer');
-  const contentDiv = container.querySelector('.detail-content');
-
-  if (!container || !contentDiv) {
-    console.error('Modal container or content div not found');
-    return;
-  }
-
-  contentDiv.innerHTML = `
-        <div class="room-details-container">
-            <h3 class="room-type-title text-center mt-3 mb-4">${roomType} Room</h3>
-            <div id="roomImageCarousel" class="carousel slide" data-bs-ride="carousel">
-                <div class="carousel-indicators">
-                    <button type="button" data-bs-target="#roomImageCarousel" data-bs-slide-to="0" class="active" aria-current="true"></button>
-                    <button type="button" data-bs-target="#roomImageCarousel" data-bs-slide-to="1"></button>
-                    <button type="button" data-bs-target="#roomImageCarousel" data-bs-slide-to="2"></button>
-                    <button type="button" data-bs-target="#roomImageCarousel" data-bs-slide-to="3"></button>
-                </div>
-
-                <div class="carousel-inner">
-                    <div class="carousel-item active">
-                    <img src="" class="d-block mx-auto" style="width: 500px; height: 300px;" id="roomImage1" alt="${roomType} Room Image 1">
-                    </div>
-                    <div class="carousel-item">
-                        <img src="" class="d-block mx-auto" style="width: 500px; height: 300px;" id="roomImage2" alt="${roomType} Room Image 2">
-                    </div>
-                    <div class="carousel-item">
-                        <img src="" class="d-block mx-auto" style="width: 500px; height: 300px;" id="roomImage3" alt="${roomType} Room Image 3">
-                    </div>
-                    <div class="carousel-item">
-                        <img src="" class="d-block mx-auto" style="width: 500px; height: 300px;" id="roomImage4" alt="${roomType} Room Image 4">
-                    </div>
-                </div>
-
-                <button class="carousel-control-prev" type="button" data-bs-target="#roomImageCarousel" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon bg-dark rounded-circle" aria-hidden="true"></span>
-                    <span class="visually-hidden">Previous</span>
-                </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#roomImageCarousel" data-bs-slide="next">
-                    <span class="carousel-control-next-icon bg-dark rounded-circle" aria-hidden="true"></span>
-                    <span class="visually-hidden">Next</span>
-                </button>
-            </div>
-
-            <div class="button-group text-center mt-3 mb-3">
-                <button type="button" class="btn btn-secondary" id="exitButton">닫기</button>
-            </div>
-        </div>
-    `;
-
-  // 모달 표시
-  container.style.display = 'flex';
-  console.log('Modal displayed');
-
-  // 모달 바깥 클릭 시 닫기
-  container.onclick = function (event) {
-    if (event.target === container) {
-      container.style.display = 'none';
-    }
-  };
-
-  // 이미지 로드
-  for (let i = 1; i <= 4; i++) {
-    const img = document.getElementById(`roomImage${i}`);
-    if (img) {
-      const imagePath = `/static/images/${roomType.toLowerCase()}/${roomType.toLowerCase()}${i}.PNG`;
-      console.log(`Loading image ${i}: ${imagePath}`);
-
-      img.onload = function () {
-        console.log(`Image ${i} loaded successfully`);
-      };
-
-      img.onerror = function () {
-        console.error(`Failed to load image ${i}: ${imagePath}`);
-        this.style.display = 'none';
-        this.closest('.carousel-item').style.display = 'none';
-        this.onerror = null;
-      };
-
-      img.src = imagePath;
-    } else {
-      console.error(`Image element ${i} not found`);
-    }
-  }
-
-  try {
-    const carouselElement = document.getElementById('roomImageCarousel');
-    if (carouselElement) {
-      const carousel = new bootstrap.Carousel(carouselElement, {
-        interval: 5000,
-        wrap: true,
-        keyboard: true,
-        pause: 'hover'
-      });
-      console.log('Carousel initialized successfully');
-    } else {
-      console.error('Carousel element not found');
-    }
-  } catch (error) {
-    console.error('Error initializing carousel:', error);
-  }
-
-  const exitButton = document.getElementById('exitButton');
-  if (exitButton) {
-    exitButton.onclick = () => {
-      console.log('Closing modal by button click');
-      container.style.display = 'none';
-    };
-  } else {
-    console.error('Exit button not found');
-  }
-}
-
 // 페이지 로드 시 세션 체크
 function checkSession() {
   fetch('/api/check-session')
@@ -577,7 +461,7 @@ function showReservationModal() {
     z-index: 1000;
   `;
 
-  // 모달 컨텐츠를 담을 iframe 생성
+  // 모달 텐츠를 담을 iframe 생성
   const modalContent = document.createElement('div');
   modalContent.style.cssText = `
     background: white;
@@ -625,4 +509,97 @@ function showReservationModal() {
       document.body.removeChild(modalContainer);
     }
   };
+}
+
+function showRoomDetails(roomType) {
+  console.log(`Showing room details for ${roomType} type`);
+
+  // 모달 컨테이너 생성
+  const modalContainer = document.createElement('div');
+  modalContainer.id = 'roomDetailContainer';
+  modalContainer.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  `;
+
+  // 모달 컨텐츠
+  const modalContent = `
+    <div class="room-details-container" style="background: white; padding: 20px; border-radius: 8px; width: 80%; max-width: 800px;">
+      <h3 class="room-type-title text-center mt-3 mb-4">${roomType} Room</h3>
+      <div id="roomImageCarousel" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+          <button type="button" data-bs-target="#roomImageCarousel" data-bs-slide-to="0" class="active" aria-current="true"></button>
+          <button type="button" data-bs-target="#roomImageCarousel" data-bs-slide-to="1"></button>
+          <button type="button" data-bs-target="#roomImageCarousel" data-bs-slide-to="2"></button>
+          <button type="button" data-bs-target="#roomImageCarousel" data-bs-slide-to="3"></button>
+        </div>
+
+        <div class="carousel-inner">
+          <div class="carousel-item active">
+            <img src="/static/images/${roomType.toLowerCase()}/${roomType.toLowerCase()}1.PNG" 
+                 class="d-block mx-auto" style="width: 500px; height: 300px;" alt="Room Image 1">
+          </div>
+          <div class="carousel-item">
+            <img src="/static/images/${roomType.toLowerCase()}/${roomType.toLowerCase()}2.PNG" 
+                 class="d-block mx-auto" style="width: 500px; height: 300px;" alt="Room Image 2">
+          </div>
+          <div class="carousel-item">
+            <img src="/static/images/${roomType.toLowerCase()}/${roomType.toLowerCase()}3.PNG" 
+                 class="d-block mx-auto" style="width: 500px; height: 300px;" alt="Room Image 3">
+          </div>
+          <div class="carousel-item">
+            <img src="/static/images/${roomType.toLowerCase()}/${roomType.toLowerCase()}4.PNG" 
+                 class="d-block mx-auto" style="width: 500px; height: 300px;" alt="Room Image 4">
+          </div>
+        </div>
+
+        <button class="carousel-control-prev" type="button" data-bs-target="#roomImageCarousel" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon bg-dark rounded-circle" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#roomImageCarousel" data-bs-slide="next">
+          <span class="carousel-control-next-icon bg-dark rounded-circle" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
+      </div>
+
+      <div class="button-group text-center mt-3">
+        <button type="button" class="btn btn-secondary" onclick="closeRoomDetails()">닫기</button>
+      </div>
+    </div>
+  `;
+
+  modalContainer.innerHTML = modalContent;
+  document.body.appendChild(modalContainer);
+
+  // 캐러셀 초기화
+  new bootstrap.Carousel(document.getElementById('roomImageCarousel'), {
+    interval: 5000,
+    wrap: true,
+    keyboard: true,
+    pause: 'hover'
+  });
+
+  // 모달 외부 클릭시 닫기
+  modalContainer.onclick = function(event) {
+    if (event.target === modalContainer) {
+      closeRoomDetails();
+    }
+  };
+}
+
+// 모달 닫기 함수
+function closeRoomDetails() {
+  const container = document.getElementById('roomDetailContainer');
+  if (container) {
+    document.body.removeChild(container);
+  }
 }
