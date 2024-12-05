@@ -48,12 +48,6 @@ async function handleReservation(e) {
     const checkinDate = new Date(document.getElementById('checkinDt').value);
     const checkoutDate = new Date(document.getElementById('checkoutDt').value);
 
-    const daysDiff = Math.floor((checkoutDate - checkinDate) / (1000 * 60 * 60 * 24));
-    if (daysDiff > 7) {
-        alert('최대 7박까지 예약할 수 있습니다.');
-        return;
-    }
-
     try {
         const response = await fetch('/api/reservation/all');
         const reservations = await response.json();
@@ -74,27 +68,38 @@ async function handleReservation(e) {
 
         const formData = {
             name: document.getElementById('name').value,
-            roomNumber: roomNumber,
+            roomNumber: document.getElementById('roomNumber').value,
             checkinDt: document.getElementById('checkinDt').value,
             checkoutDt: document.getElementById('checkoutDt').value
         };
 
+        console.log('서버로 전송되는 데이터:', formData);
+
         const reservationResponse = await fetch('/api/reservation', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify(formData)
         });
 
+        const responseData = await reservationResponse.text();
+        console.log('서버 응답:', responseData);
+
         if (!reservationResponse.ok) {
-            throw new Error(`HTTP error! status: ${reservationResponse.status}`);
+            throw new Error(`예약 실패: ${responseData}`);
         }
 
-        const reservationResult = await reservationResponse.json();
-        if (reservationResult.success) {
-            alert('예약이 완료되었습니다.');
-            window.location.href = '/dashboard';
-        } else {
-            alert(reservationResult.message || '예약에 실패했습니다.');
+        try {
+            const reservationResult = JSON.parse(responseData);
+            if (reservationResult.success) {
+                alert('예약이 완료되었습니다.');
+                window.parent.document.getElementById('reservationModalContainer').remove();
+            } else {
+                alert(reservationResult.message || '예약에 실패했습니다.');
+            }
+        } catch (e) {
+            throw new Error('서버 응답을 처리할 수 없습니다: ' + responseData);
         }
     } catch (error) {
         console.error('예약 처리 중 에러:', error);
@@ -109,38 +114,22 @@ function initializeReservationPage() {
 
     document.getElementById('reservationForm').addEventListener('submit', handleReservation);
     document.getElementById('cancelButton').addEventListener('click', () => {
-        window.location.href = '/dashboard';
+        // 부모 창의 모달 닫기 함수 호출
+        window.parent.document.getElementById('reservationModalContainer').remove();
     });
 }
 
-// // 페이지 로드 시 실행
-// document.addEventListener('DOMContentLoaded', function () {
-//     console.log('Reservation page loaded');
-
-//     // 세션 체크
-//     fetch('/api/check-session')
-//         .then(response => {
-//             console.log('Session check response:', response.status);
-//             if (!response.ok) {
-//                 window.location.href = '/login';
-//                 return;
-//             }
-//             // 세션이 유효하면 바로 초기화 진행
-//             initializeReservationPage();
-//         })
-//         .catch((error) => {
-//             console.error('Session check error:', error);
-//             window.location.href = '/login';
-//         });
-// });
 document.addEventListener('DOMContentLoaded', checkSession);
 window.addEventListener('focus', checkSession);
+
 // 세션 체크
 function checkSession() {
     fetch('/api/check-session')
         .then(response => {
             if (!response.ok) {
                 window.location.href = '/login';
+            } else {
+                initializeReservationPage();
             }
         })
         .catch(() => {

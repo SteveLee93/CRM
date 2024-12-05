@@ -98,7 +98,7 @@ public class DatabaseManager {
   }
 
   public boolean updateRoom(String roomNumber, String roomType, String status) throws SQLException {
-    String sql = "UPDATE room SET room_type = ? WHERE room_number = ?";
+    String sql = "UPDATE room SET room_type = ?, room_status = ? WHERE room_number = ?";
 
     try (Connection conn = getConnection();
         PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -106,9 +106,11 @@ public class DatabaseManager {
       System.out.println("Updating room with parameters:");
       System.out.println("Room Number: " + roomNumber);
       System.out.println("Room Type: " + roomType);
+      System.out.println("Status: " + status);
 
       stmt.setString(1, roomType);
-      stmt.setString(2, roomNumber);
+      stmt.setString(2, status);
+      stmt.setString(3, roomNumber);
 
       int rowsAffected = stmt.executeUpdate();
       System.out.println("Rows affected: " + rowsAffected);
@@ -217,6 +219,51 @@ public class DatabaseManager {
     } catch (SQLException e) {
       LOGGER.severe("Error retrieving customers: " + e.getMessage());
       e.printStackTrace();
+      throw e;
+    }
+  }
+
+  public JSONArray getRoomImages(String roomNumber) throws SQLException {
+    JSONArray images = new JSONArray();
+    String sql = "SELECT id, room_number, image_path FROM room_images WHERE room_number = ?";
+
+    try (Connection conn = getConnection();
+        PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+      pstmt.setString(1, roomNumber);
+
+      try (ResultSet rs = pstmt.executeQuery()) {
+        while (rs.next()) {
+          JSONObject image = new JSONObject();
+          image.put("id", rs.getInt("id"));
+          image.put("roomNumber", rs.getString("room_number"));
+          image.put("imagePath", rs.getString("image_path"));
+          images.put(image);
+        }
+      }
+
+      LOGGER.info("Retrieved " + images.length() + " images for room " + roomNumber);
+      return images;
+    } catch (SQLException e) {
+      LOGGER.severe("Error getting room images: " + e.getMessage());
+      throw e;
+    }
+  }
+
+  public boolean addRoomImage(String roomNumber, String imagePath) throws SQLException {
+    String sql = "INSERT INTO room_images (room_number, image_path) VALUES (?, ?)";
+
+    try (Connection conn = getConnection();
+        PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+      pstmt.setString(1, roomNumber);
+      pstmt.setString(2, imagePath);
+
+      int result = pstmt.executeUpdate();
+      LOGGER.info("Added image for room " + roomNumber + ": " + imagePath);
+      return result > 0;
+    } catch (SQLException e) {
+      LOGGER.severe("Error adding room image: " + e.getMessage());
       throw e;
     }
   }

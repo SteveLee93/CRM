@@ -1,89 +1,329 @@
 body {
-    overflow-x: hidden;
-    background-color: #f8f9fa;
-  }
+  overflow-x: hidden;
+  background-color: #f8f9fa;
+}
 
+.page-wrapper {
+  min-height: 100vh;
+  padding: 15px 30px;
+  background-color: #f8f9fa;
+}
+
+.main-content {
+  margin-left: 250px;
+  padding-top: 20px;
+  transition: margin-left 0.3s ease;
+}
+
+.room-table th,
+.room-table td {
+  vertical-align: middle;
+  padding: 0.5rem;
+}
+
+/* 컨테이너 내부 여백 */
+.container-fluid {
+  max-width: 1800px;
+  margin: 0 auto;
+}
+
+/* 모바일 대응 */
+@media (max-width: 991.98px) {
   .page-wrapper {
-    min-height: 100vh;
-    padding: 20px 40px;
-    background-color: #f8f9fa;
+    padding: 15px 20px;
   }
 
   .main-content {
-    margin-left: 250px;
+    margin-left: 0;
     padding-top: 40px;
-    transition: margin-left 0.3s ease;
   }
+}
 
-  .room-table th,
-  .room-table td {
-    vertical-align: middle;
-  }
+.card {
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  border: none;
+  margin-bottom: 1rem;
+  overflow-y: auto;
+}
 
-  /* 컨테이너 내부 여백 */
-  .container-fluid {
-    max-width: 1800px;
-    margin: 0 auto;
-  }
+.card-body {
+  padding: 1rem;
+}
 
-  /* 모바일 대응 */
-  @media (max-width: 991.98px) {
-    .page-wrapper {
-      padding: 15px 20px;
-    }
+.card-title {
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+  font-weight: 500;
+}
 
-    .main-content {
-      margin-left: 0;
-      padding-top: 40px;
-    }
+.card-text {
+  margin-bottom: 0;
+  font-weight: 700;
+}
+
+canvas {
+  max-height: 250px;
+}
+
+.input-group {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.input-group-text {
+  background-color: #fff;
+  border-right: none;
+}
+
+#roomSearch {
+  border-left: none;
+}
+
+#roomSearch:focus {
+  box-shadow: none;
+}
+
+.btn-outline-secondary {
+  border-left: none;
+}
+
+#searchInfo {
+  margin-bottom: 1rem;
+}
+
+.room-images-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.image-card {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.image-card img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+}
+
+.image-card .overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.image-card .overlay button {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+.card {
+  overflow-y: auto;
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+.form-select {
+  color: black !important;
+  font-weight: 500;
+}
+
+/* 스크롤바 스타일링 */
+.card::-webkit-scrollbar {
+  width: 8px;
+}
+
+.card::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.card::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.card::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* 반응형 조정 */
+@media (max-width: 768px) {
+
+  .col-md-7,
+  .col-md-5 {
+    margin-bottom: 1rem;
   }
 
   .card {
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-    border: none;
-    margin-bottom: 1rem;
+    height: auto;
+  }
+}
+
+.row.mb-4 .card {
+  height: auto;
+  margin-bottom: 0.5rem;
+}
+
+.row.mb-4 .card-body {
+  padding: 0.75rem;
+}
+
+.row.mb-4 canvas {
+  max-height: 200px;
+}
+
+.mb-4 {
+  margin-bottom: 1rem !important;
+}
+
+/* 객실 목록 카드 스타일 수정 */
+.col-md-7 .card {
+  height: calc(100vh - 400px);
+  min-height: 450px;
+}
+
+.col-md-7 .card-body {
+  padding: 1rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 테이블 컨테이너 스크롤 스타일 */
+.table-responsive {
+  flex: 1;
+  overflow-y: auto;
+  margin-top: 1rem;
+  border-radius: 4px;
+}
+
+/* 테이블 헤더 고정 */
+.room-table thead th {
+  position: sticky;
+  top: 0;
+  background-color: #212529;
+  z-index: 1;
+}
+
+/* 스크롤바 스타일링 */
+.table-responsive::-webkit-scrollbar {
+  width: 8px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* 테이블 행 스타일 */
+.room-table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+.room-table th,
+.room-table td {
+  padding: 0.75rem;
+  vertical-align: middle;
+}
+
+/* 검색창 영역 고정 */
+.search-area {
+  margin-bottom: 1rem;
+  position: sticky;
+  top: 0;
+  background-color: white;
+  z-index: 2;
+  padding: 1rem 0;
+}
+
+/* 반응형 조정 */
+@media (max-width: 768px) {
+  .col-md-7 .card {
+    height: auto;
+    max-height: 500px;
+  }
+}
+
+/* 차트 섹션 컨테이너 스타일 */
+.col-md-5 {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 400px);
+  /* 객실 관리 섹션과 동일한 높이 */
+  min-height: 450px;
+}
+
+/* 각 차트 카드 스타일 */
+.col-md-5 .mb-3 {
+  flex: 1;
+  /* 남은 공간을 균등하게 분배 */
+  margin-bottom: 1rem !important;
+}
+
+.col-md-5 .card {
+  height: 100%;
+  /* 카드가 컨테이너 높이를 채우도록 설정 */
+}
+
+.col-md-5 .card-body {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 차트 캔버스 스타일 */
+.col-md-5 canvas {
+  flex: 1;
+  /* 카드 내부 남은 공간을 차트가 채우도록 설정 */
+  width: 100% !important;
+}
+
+/* 마지막 차트의 마진 제거 */
+.col-md-5 .mb-3:last-child {
+  margin-bottom: 0 !important;
+}
+
+/* 객실 목록 카드 스타일 (기존 유지) */
+.col-md-7 .card {
+  height: calc(100vh - 400px);
+  min-height: 450px;
+}
+
+/* 반응형 조정 */
+@media (max-width: 768px) {
+
+  .col-md-5,
+  .col-md-7 .card {
+    height: auto;
+    min-height: 300px;
   }
 
-  .card-body {
-    padding: 1.25rem;
+  .col-md-5 .mb-3 {
+    margin-bottom: 1rem !important;
   }
 
-  .card-title {
-    margin-bottom: 0.75rem;
-    font-size: 1rem;
-    font-weight: 500;
+  .col-md-5 canvas {
+    max-height: 200px;
   }
-
-  .card-text {
-    margin-bottom: 0;
-    font-weight: 700;
-  }
-
-  canvas {
-    max-height: 300px;
-  }
-
-  .input-group {
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-
-  .input-group-text {
-    background-color: #fff;
-    border-right: none;
-  }
-
-  #roomSearch {
-    border-left: none;
-  }
-
-  #roomSearch:focus {
-    box-shadow: none;
-  }
-
-  .btn-outline-secondary {
-    border-left: none;
-  }
-
-  #searchInfo {
-    margin-bottom: 1rem;
-  }
+}

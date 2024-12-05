@@ -30,7 +30,7 @@
       background-color: #fff;
       padding: 20px;
       border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     .info-item {
@@ -104,9 +104,9 @@
     <div class="main-content">
       <div class="container-fluid">
         <!-- 대시보드 섹션의 row에 새로운 카드 추가 -->
-        <div class="row mb-4">
+        <div class="row mb-3">
           <!-- 전체 현황 카드 -->
-          <div class="col-md-2">
+          <div class="col-md-4">
             <div class="card">
               <div class="card-body">
                 <h5 class="card-title">전체 객실</h5>
@@ -115,7 +115,7 @@
             </div>
           </div>
           <!-- 이용 가능 객실 -->
-          <div class="col-md-2">
+          <div class="col-md-4">
             <div class="card bg-success text-white">
               <div class="card-body">
                 <h5 class="card-title">이용 가능</h5>
@@ -123,17 +123,8 @@
               </div>
             </div>
           </div>
-          <!-- 사용 중인 객실 -->
-          <div class="col-md-2">
-            <div class="card bg-danger text-white">
-              <div class="card-body">
-                <h5 class="card-title">사용 중</h5>
-                <h2 class="card-text" id="occupiedRooms">0</h2>
-              </div>
-            </div>
-          </div>
           <!-- 점검 중인 객실 -->
-          <div class="col-md-2">
+          <div class="col-md-4">
             <div class="card bg-warning">
               <div class="card-body">
                 <h5 class="card-title">점검 중</h5>
@@ -141,150 +132,155 @@
               </div>
             </div>
           </div>
-          <!-- 예약됨 객실 -->
-          <div class="col-md-2">
-            <div class="card bg-info text-white">
-              <div class="card-body">
-                <h5 class="card-title">예약됨</h5>
-                <h2 class="card-text" id="reservedRooms">0</h2>
+        </div>
+
+        <!-- 메인 컨텐츠 영역 -->
+        <div class="row">
+          <!-- 왼쪽: 차트 섹션 -->
+          <div class="col-md-5">
+            <!-- 객실 상태 파이 차트 -->
+            <div class="mb-3">
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">객실 상태 현황</h5>
+                  <div>
+                    <canvas style="position: relative; height: 300px; width: 100%;" id="statusChart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- 객실 타입별 현황 차트 -->
+            <div class="mb-3">
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">객실 타입별 현황</h5>
+                  <canvas id="typeChart"></canvas>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- 차트 섹션 -->
-        <div class="row mb-4">
-          <!-- 객실 상태 파이 차트 -->
-          <div class="col-md-6">
+          <!-- 오른쪽: 객실 목록 -->
+          <div class="col-md-7">
             <div class="card">
               <div class="card-body">
-                <h5 class="card-title">객실 상태 현황</h5>
-                <canvas id="statusChart"></canvas>
+                <h2 class="card-title d-flex justify-content-between align-items-center mb-2">
+                  객실 관리
+                  <button class="btn btn-primary" onclick="showAddModal()">
+                    <i class="fas fa-plus"></i> 객실 추가
+                  </button>
+                </h2>
+
+                <!-- 검색창 -->
+                <div class="mb-3">
+                  <div class="input-group">
+                    <span class="input-group-text">
+                      <i class="fas fa-search"></i>
+                    </span>
+                    <input type="text" class="form-control" id="roomSearch" placeholder="객실 번호 검색..."
+                      onkeyup="searchRooms()">
+                    <button class="btn btn-outline-secondary" type="button" onclick="clearSearch()">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- 객실 테이블 -->
+                <div class="table-responsive">
+                  <table class="table table-hover room-table">
+                    <thead class="table-dark">
+                      <tr>
+                        <th>객실 번호</th>
+                        <th>객실 타입</th>
+                        <th>상태</th>
+                        <th>관리</th>
+                      </tr>
+                    </thead>
+                    <tbody id="roomTableBody">
+                      <!-- JavaScript로 동적 생성 -->
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           </div>
-          <!-- 객실 타입별 현황 차트 -->
-          <div class="col-md-6">
-            <div class="card">
-              <div class="card-body">
-                <h5 class="card-title">객실 타입별 현황</h5>
-                <canvas id="typeChart"></canvas>
+        </div>
+
+
+        <!-- 객실 추가/수정 모달 -->
+        <div class="modal fade" id="roomModal" tabindex="-1">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">객실 추가</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              </div>
+              <div class="modal-body">
+                <form id="roomForm">
+                  <div class="mb-3">
+                    <label class="form-label">객실 번호</label>
+                    <input type="text" class="form-control" id="roomNumber" required>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">객실 타입</label>
+                    <select class="form-select" id="roomType" required>
+                      <option value="VIP">VIP</option>
+                      <option value="SUITE">SUITE</option>
+                      <option value="BUSINESS">BUSINESS</option>
+                      <option value="NORMAL">NORMAL</option>
+                    </select>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">객실 상태</label>
+                    <select class="form-select" id="roomStatus" required>
+                      <option value="available">이용 가능</option>
+                      <option value="maintenance">점검 중</option>
+                    </select>
+                  </div>
+                </form>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                <button type="button" class="btn btn-primary" id="saveButton">저장</button>
               </div>
             </div>
           </div>
         </div>
 
-        <h2 class="mb-4">객실 관리
-          <button class="btn btn-primary float-end" onclick="showAddModal()">
-            <i class="fas fa-plus"></i> 객실 추가
-          </button>
-        </h2>
-
-        <!-- 여기에 검색창 추가 -->
-        <div class="row mb-4">
-          <div class="col-md-6">
-            <div class="input-group">
-              <span class="input-group-text">
-                <i class="fas fa-search"></i>
-              </span>
-              <input type="text" class="form-control" id="roomSearch" placeholder="객실 번호 검색..." onkeyup="searchRooms()">
-              <button class="btn btn-outline-secondary" type="button" onclick="clearSearch()">
-                <i class="fas fa-times"></i>
-              </button>
+        <!-- 객실 상세 정보 모달 (이미지 갤러리) -->
+        <div class="modal fade" id="roomDetailModal" tabindex="-1" aria-labelledby="roomDetailModalLabel"
+          aria-hidden="false">
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="roomDetailModalLabel">객실 갤러리</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body" id="roomDetailModalBody">
+                <!-- 이미지 업로드 폼 추가 -->
+                <div class="mb-3">
+                  <form id="imageUploadForm" enctype="multipart/form-data">
+                    <input type="file" class="form-control" id="roomImage" name="image" accept="image/*"
+                      aria-label="이미지 선택">
+                    <button type="button" class="btn btn-primary mt-2" onclick="uploadImage()" aria-label="이미지 업로드">이미지
+                      업로드</button>
+                  </form>
+                </div>
+                <!-- 이미지 갤러리 컨테이너 -->
+                <div id="roomImagesContainer" class="row" role="region" aria-label="이미지 갤러리">
+                  <!-- 이미지들이 여기에 동적으로 추가됨 -->
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="닫기">닫기</button>
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="table-responsive">
-          <table class="table table-hover room-table">
-            <thead class="table-dark">
-              <tr>
-                <th>객실 번호</th>
-                <th>객실 타입</th>
-                <th>상태</th>
-                <th>관리</th>
-              </tr>
-            </thead>
-            <tbody id="roomTableBody">
-              <!-- JavaScript로 동적 생성 -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 객실 추가/수정 모달 -->
-  <div class="modal fade" id="roomModal" tabindex="-1">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="modalTitle">객실 추가</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <form id="roomForm">
-            <div class="mb-3">
-              <label class="form-label">객실 번호</label>
-              <input type="text" class="form-control" id="roomNumber" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">객실 타입</label>
-              <select class="form-select" id="roomType" required>
-                <option value="VIP">VIP</option>
-                <option value="SUITE">SUITE</option>
-                <option value="BUSINESS">BUSINESS</option>
-                <option value="NORMAL">NORMAL</option>
-              </select>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">객실 상태</label>
-              <select class="form-select" id="roomStatus" required>
-                <option value="available">이용 가능</option>
-                <option value="maintenance">점검 중</option>
-              </select>
-            </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-          <button type="button" class="btn btn-primary" id="saveButton">저장</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 객실 상세 정보 모달 (이미지 갤러리) -->
-  <div class="modal fade" id="roomDetailModal" tabindex="-1" aria-labelledby="roomDetailModalLabel" aria-hidden="false">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="roomDetailModalLabel">객실 갤러리</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body" id="roomDetailModalBody">
-          <!-- 이미지 업로드 폼 추가 -->
-          <div class="mb-3">
-            <form id="imageUploadForm" enctype="multipart/form-data">
-              <input type="file" class="form-control" id="roomImage" name="image" accept="image/*" aria-label="이미지 선택">
-              <button type="button" class="btn btn-primary mt-2" onclick="uploadImage()" aria-label="이미지 업로드">이미지 업로드</button>
-            </form>
-          </div>
-          <!-- 이미지 갤러리 컨테이너 -->
-          <div id="roomImagesContainer" class="row" role="region" aria-label="이미지 갤러리">
-            <!-- 이미지들이 여기에 동적으로 추가됨 -->
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="닫기">닫기</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="/static/js/roomManagement.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="/static/js/roomManagement.js"></script>
 </body>
 
 </html>
